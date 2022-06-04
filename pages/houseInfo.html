@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <link rel="stylesheet" href="../style/style1.css" />
+
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+
+    <script>
+
+        $(document).ready(function () {
+            $("#signIn").click(signInHerf);
+            $("#signUp").click(signUpHerf);
+            $("#logoPic").click(indexHerf);
+            activeUser();
+            loadHouse();
+        });
+
+        function loadHouse(id) {
+            id = 9410136;
+
+            let api = "../api/Houses/"+id;
+            ajaxCall("GET", api, "", getHouseSuccessCB, getHouseErrorCB);
+
+        }
+
+        function buildPage(house) {
+            let str = "";
+            str += "<h1>" + house.Name + "</h1>";
+            str += "<div id=right>"
+            str += "<img src=" + house.Picture + ">";
+            str += "</div>"
+            $("#big").html(str);
+        }
+
+
+        function getHouseSuccessCB(house) {
+            console.log(house);
+            buildPage(house);
+        }
+
+        function getHouseErrorCB(err) {
+            console.log(err);
+        }
+
+        function activeUser() {
+            if (localStorage.getItem("user") == 'undefined') {
+                let active = JSON.parse(localStorage.getItem("user"));
+                let str = "<p>Hello <br>";
+                str += active.Username;
+                str += "</p>";
+                str += '<button id="logOut">LOG OUT</button>'
+                $("#sign").html(str);
+                $("#logOut").click(logOut);
+            }
+        }
+
+        function logOut() {
+            localStorage.clear();
+            indexHerf();
+        }
+
+
+        function signInHerf() {
+            window.location.href = 'signIn.html';
+        }
+
+        function signUpHerf() {
+            window.location.href = 'signUp.html';
+        }
+
+        function indexHerf() {
+            window.location.href = 'index.html';
+        }
+
+
+    </script>
+
+
+</head>
+<body>
+
+    <div id="logo">
+
+        <div id="sign">
+            <button id="signIn">sign in</button>
+            <button id="signUp">sign up</button>
+        </div>
+
+        <img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />
+        <h1>Ruppin Rent</h1>
+    </div>
+
+    <div id="big">
+       
+    </div>
+
+</body>
+</html>

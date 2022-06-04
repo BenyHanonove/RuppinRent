@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="../style/style1.css" />
+
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+
+    <script>
+
+        $(document).ready(function () {
+            $("#signUp").click(signUpHerf);
+            $("#logoPic").click(indexHerf);
+            $("#btn").click(LogIn);
+        });
+
+        function signUpHerf() {
+            window.location.href = 'signUp.html';
+        }
+
+        function indexHerf() {
+            window.location.href = 'index.html';
+        }
+
+        function LogIn() {
+            let api = "../api/Users";
+            ajaxCall("GET", api, "", getUsersSuccessCB, getUsersErrorCB);
+        }
+        
+        function getUsersSuccessCB(users) {
+
+            let inputEmail = $("#emailBox").val();
+            let inputPassword = $("#passwordBox").val();
+
+            localStorage.clear();
+            console.log(users);
+
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].Email == inputEmail) {
+                    if (users[i].Password == inputPassword) {
+                        alert("Hello " + users[i].Username);
+                        let active = JSON.stringify(users[i]);
+                        localStorage.setItem("user", active);
+                        indexHerf();
+                    }
+                }
+            }
+
+        }
+
+        function getUsersErrorCB(err) {
+            console.log(err);
+        }
+
+    </script>
+
+</head>
+<body>
+
+    <div id="logo">
+
+        <div id="sign">
+            <button id="signUp">sign up</button>
+        </div>
+
+        <img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />
+        <h1>Ruppin Rent</h1>
+    </div>
+
+    <div id="input">
+        <h1>SIGN IN</h1>
+        <h2>Email:</h2>>
+        <input id="emailBox" type="text" />
+        <br>
+        <h2>Password:</h2>>
+        <input id="passwordBox" type="text" />
+        <br>
+        <button id="btn">Enter</button>
+    </div>
+
+
+</body>
+</html>

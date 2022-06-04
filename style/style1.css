@@ -1,0 +1,55 @@
+﻿h1 {
+    text-align: center;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100px;
+    height: 120px;
+}
+
+#logo {
+    height: 30px;
+    width: 100%;
+}
+
+#sign {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#input {
+    margin-top:180px;
+    text-align:center;
+    width: 100%;
+}
+
+.tiny {
+    margin-left: auto;
+    margin-right: auto;
+    display:block;
+    height: 100px;
+    width: 80px;
+    border:solid 1px grey;
+}
+
+#big{
+    margin-top:200px;
+}
+
+.small{
+    width:200px;
+    height:200px;
+    float:left;
+}
+
+img{
+    height:270px;
+    width:250px;
+}
+
+
+

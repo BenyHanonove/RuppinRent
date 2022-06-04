@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="../style/style1.css" />
+
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+
+    <script>
+
+        $(document).ready(function () {
+            $("#signIn").click(signInHerf);
+            $("#signUp").click(signUpHerf);
+            $("#logoPic").click(indexHerf);
+            activeUser();
+            loadHouses();
+        });
+
+        function loadHouses() {
+            let api = "../api/Houses";
+            ajaxCall("GET", api, "", getHousesSuccessCB, getHousesErrorCB);
+        }
+
+        function getHousesSuccessCB(houses) {
+            console.log(houses);
+            let str = "<h1>Top rated houses</h1>";
+            let counter = 0;
+            let values = [];
+            let alreadyIn = false;
+
+            while (counter <= 6) {
+                let i = Math.floor(Math.random() * 100);
+                alreadyIn = false;
+
+                for (let j = 0; j < values.length; j++) {
+                    if (values[j] == i) {
+                        alreadyIn = true;
+                    }
+                }
+
+                if (houses[i].Score > 4.7 && alreadyIn == false) {
+                    values[counter] = i;
+                    str += "<div class='small'>";
+                    str += "<img class='tiny' src=" + houses[i].Picture + ">";
+                    str += "<p>" + houses[i].Name + "</p>";
+                    str += "<p>" + houses[i].Score + "★</p>";
+                    str += "</div>";
+                    counter++;
+                }
+
+            }
+
+            $("#big").html(str);
+        }
+
+
+        function getHousesErrorCB(err) {
+            console.log(err);
+        }
+
+
+        function activeUser() {
+
+            if (localStorage) {
+                let active = JSON.parse(localStorage.getItem("user"));
+                let str = "<p>Hello <br>";
+                str += active.Username;
+                str += "</p>";
+                str += '<button id="logOut">LOG OUT</button>'
+                $("#sign").html(str);
+                $("#logOut").click(logOut);
+            }
+
+        }
+
+        function logOut() {
+            localStorage.clear();
+            indexHerf();
+        }
+
+
+        function signInHerf() {
+            window.location.href = 'signIn.html';
+        }
+
+        function signUpHerf() {
+            window.location.href = 'signUp.html';
+        }
+
+        function indexHerf() {
+            window.location.href = 'index.html';
+        }
+
+    </script>
+
+</head>
+<body >
+    
+    <div id="logo">
+       
+        <div id="sign">
+            <button id="signIn">sign in</button>
+            <button id="signUp">sign up</button>
+        </div>
+
+        <img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />
+        <h1>Ruppin Rent</h1>
+    </div> 
+
+    <div id="big">
+        
+    </div>
+
+</body>
+</html>

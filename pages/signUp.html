@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="../style/style1.css" />
+
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+
+    <script>
+
+        $(document).ready(function () {
+            $("#signIn").click(signInHerf);
+            $("#logoPic").click(indexHerf);
+            $("#btn").click(addUser);
+        });
+
+        function signInHerf() {
+            window.location.href = 'signIn.html';
+        }
+
+
+        function indexHerf() {
+            window.location.href = 'index.html';
+        }
+
+        function BuildUser() {
+            let email = $("#emailBox").val();
+            let password = $("#passwordBox").val();
+            let username = $("#usernameBox").val();
+
+            let userData = {
+                EMAIL:email,
+                PASSWORD: password,
+                USERNAME: username
+            };
+            console.log(userData);
+            addUser(userData);
+
+        }
+
+        function addUser(user) {
+            let api = "../api/Users";
+            ajaxCall("POST", api, JSON.stringify(user), addUserSuccessCB, addUserErrorCB);
+        }
+
+        function addUserSuccessCB(status) {
+            console.log(status);
+            alert("account has been create");
+            indexHerf();
+        }
+
+        function addUserErrorCB(err){
+            console.log(err);
+        }
+
+
+    </script>
+
+</head>
+<body>
+
+    <div id="logo">
+
+        <div id="sign">
+            <button id="signIn">sign in</button>
+        </div>
+
+        <img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />
+        <h1>Ruppin Rent</h1>
+    </div>
+
+    <div id="input">
+        <h1>SIGN UP</h1>
+        <h2>Email:</h2>>
+        <input id="emailBox" type="text" />
+        <br>
+        <h2>Password:</h2>>
+        <input id="passwordBox" type="text" />
+        <br>
+        <h2>Username:</h2>>
+        <input id="usernameBox" type="text" />
+        <br>
+        <button id="btn">Enter</button>
+    </div>
+
+</body>
+</html>
