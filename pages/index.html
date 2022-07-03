@@ -1,25 +1,151 @@
-﻿<!DOCTYPE html>
+﻿\<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title></title>
+    <link rel="stylesheet" hrel="../style/indexStyle.css" />
     <link rel="stylesheet" href="../style/style1.css" />
 
     <script src="../Scripts/ajaxCalls.js"></script>
-
+    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
             crossorigin="anonymous">
     </script>
 
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Style the search field */
+        style input[type=text] {
+            padding: 10px;
+            font-size: 17px;
+            border: 1px solid grey;
+            float: left;
+            width: 80%;
+            background: #f1f1f1;
+        }
+
+        /* Style the submit button */
+        style button {
+            float: left;
+            width: 20%;
+            padding: 10px;
+            background: #2196F3;
+            color: white;
+            font-size: 17px;
+            border: 1px solid grey;
+            border-left: none; /* Prevent double borders */
+            cursor: pointer;
+        }
+
+            style button:hover {
+                background: #0b7dda;
+            }
+
+        /* Clear floats */
+        style::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        /* Dropdown Button */
+        .dropbtn {
+            background-color: #04AA6D;
+            color: white;
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+            /* Dropdown button on hover & focus */
+            .dropbtn:hover, .dropbtn:focus {
+                background-color: #3e8e41;
+            }
+
+
+            /* The search field when it gets focus/clicked on */
+            #myInput:focus {
+                outline: 3px solid #ddd;
+            }
+
+        /* The container <div> - needed to position the dropdown content */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Dropdown Content (Hidden by Default) */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f6f6f6;
+            min-width: 230px;
+            border: 1px solid #ddd;
+            z-index: 1;
+        }
+
+            /* Links inside the dropdown */
+            .dropdown-content button {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+                /* Change color of dropdown links on hover */
+                .dropdown-content button:hover {
+                    background-color: #f1f1f1
+                }
+
+        /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+        .show {
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            margin: 50px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        input[type=range] {
+            width: 100%;
+        }
+
+        .container > button {
+            flex: 0 0 auto;
+            width: 40px;
+            height: 40px;
+            border-radius: 100%;
+            background: white;
+            font-size: 24px;
+            border: 1px solid lightgrey;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin: 0 10px;
+        }
+
+
+    </style>
+
+
     <script>
 
         $(document).ready(function () {
+            localStorage.removeItem("house");
             $("#signIn").click(signInHerf);
             $("#signUp").click(signUpHerf);
             $("#logoPic").click(indexHerf);
             activeUser();
             loadHouses();
+            filterFunction();
         });
 
         function loadHouses() {
@@ -27,8 +153,8 @@
             ajaxCall("GET", api, "", getHousesSuccessCB, getHousesErrorCB);
         }
 
-        function getHousesSuccessCB(houses) {
-            console.log(houses);
+        function getHousesSuccessCB(houses){
+
             let str = "<h1>Top rated houses</h1>";
             let counter = 0;
             let values = [];
@@ -47,8 +173,7 @@
                 if (houses[i].Score > 4.7 && alreadyIn == false) {
                     values[counter] = i;
                     str += "<div class='small'>";
-                    str += "<img class='tiny' src=" + houses[i].Picture + ">";
-                    str += "<p>" + houses[i].Name + "</p>";
+                    str += "<img class='tiny' onclick='viewHouseInfo(" + (houses[i].Id).toString() + ")' src=" + houses[i].Picture + ">";
                     str += "<p>" + houses[i].Score + "★</p>";
                     str += "</div>";
                     counter++;
@@ -64,19 +189,70 @@
             console.log(err);
         }
 
+        function viewHouseInfo(id) {
+
+            localStorage.setItem("house", id);
+            window.location.href = 'houseInfo.html';
+
+        }
 
         function activeUser() {
 
-            if (localStorage) {
+
+            if (localStorage.getItem("user") != null) {
                 let active = JSON.parse(localStorage.getItem("user"));
                 let str = "<p>Hello <br>";
                 str += active.Username;
                 str += "</p>";
-                str += '<button id="logOut">LOG OUT</button>'
+                str += '<button id="logOut">LOG OUT</button>';
+                str += '<button id="orderBtn">MY ORDERS</button>';
                 $("#sign").html(str);
+                $("#orderBtn").click(myOrdersHerf);
                 $("#logOut").click(logOut);
             }
+            else {
 
+                let str = "<p>Hello Guest<br>";
+                str += "</p>";
+                str += '<button id="signIn">sign in</button>';
+                str += '<button id="signUp">sign up</button>';
+                $("#sign").html(str);
+                $("#signIn").click(signInHerf);
+                $("#signUp").click(signUpHerf);
+
+            }
+
+        }
+
+        function searchByName() {
+            const val = document.querySelector('input').value;
+            console.log(val);
+            let api = "../api/Houses?name=" + val;
+            ajaxCall("GET", api, "", getHouseNameSuccessCB, getHouseNameErrorCB);
+
+        }
+
+        function getHouseNameSuccessCB(houses) {
+            console.log(houses);
+            let str = "<h1> Results : </h1>";
+            let counter = 0;
+
+            for (var i = 0; i < houses.length; i++) {
+
+
+                str += "<div class='small'>";
+                str += "<img class='tiny' src=" + houses[i].Picture + ">";
+                str += "<p>" + houses[i].Name + "</p>";
+                str += "<p>" + houses[i].Score + "★</p>";
+                str += "</div>";
+                counter++;
+            }
+
+            $("#big").html(str);
+        }
+
+        function getHouseNameErrorCB(err) {
+            console.log(err);
         }
 
         function logOut() {
@@ -86,10 +262,12 @@
 
 
         function signInHerf() {
+            localStorage.clear();
             window.location.href = 'signIn.html';
         }
 
         function signUpHerf() {
+            localStorage.clear();
             window.location.href = 'signUp.html';
         }
 
@@ -97,25 +275,126 @@
             window.location.href = 'index.html';
         }
 
+        function myOrdersHerf() {
+            window.location.href = 'myOrders.html';
+        }
+
+        function dropDown() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+        function filterFunction() {
+
+            $("#roomsRangeMinus, #minus, #scoreRangeMinus, #priceRangeMinus").click(function (event) {
+                zoom("out");
+            });
+
+            $("#roomsRangePlus, #plus, #scoreRangePlus, #priceRangePlus").click(function (event) {
+                zoom("in");
+            });
+
+            $("#range").on('input change', function (event) {
+                $('#output').text($(event.currentTarget).val());
+            });
+
+            $("#roomsRange").on('input change', function (event) {
+                $('#roomsRangeOutput').text($(event.currentTarget).val());
+            });
+
+            $("#priceRange").on('input change', function (event) {
+                $('#priceRangeOutput').text($(event.currentTarget).val());
+            });
+
+            $("#scoreRange").on('input change', function (event) {
+                $('#scoreRangeOutput').text($(event.currentTarget).val());
+            });
+
+            function zoom(direction) {
+                var filterID = event.target.value;
+                console.log(filterID, direction);
+                var slider = $("#" + filterID);
+                var step = parseInt(slider.attr('step'), 10);
+                var currentSliderValue = parseInt(slider.val(), 10);
+                console.log(step)
+                var newStepValue = currentSliderValue + step;
+
+                if (direction === "out") {
+                    newStepValue = currentSliderValue - step;
+                } else {
+                    newStepValue = currentSliderValue + step;
+                }
+
+                slider.val(newStepValue).change();
+            };
+
+        }
+
+
+        function updateFilters() {
+            console.log("hi")
+        }
+
+
     </script>
 
 </head>
 <body >
     
     <div id="logo">
-       
+
         <div id="sign">
             <button id="signIn">sign in</button>
             <button id="signUp">sign up</button>
         </div>
-
         <img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />
         <h1>Ruppin Rent</h1>
-    </div> 
 
-    <div id="big">
-        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <input class="style" type="text" id="search" placeholder="Search.." name="search">
+        <button class="style" onclick="searchByName()"><i class="fa fa-search"></i></button>
+        <div class="dropdown">
+            <button onclick="dropDown()" class="dropbtn">Filter</button>
+            <div id="myDropdown" class="dropdown-content">
+                <div class="container" id="apply">
+                    <button class="style" onclick="updateFilters()">Apply<i class="fa fa-edit"></i></button>
+                </div>
+                <div class="container" id="distance">
+                    Distance:
+                    <button value="range" id="minus">-</button>
+                    <input id="range" type="range" step="10" value="50">
+                    <button value="range" id="plus">+</button>
+                    <output for="range" id="output">50</output>
+                </div>
+                <div class="container" id="scoree">
+                    Score:
+                    <button value="scoreRange" id="scoreRangeMinus">-</button>
+                    <input id="scoreRange" type="range" step="10" value="50">
+                    <button value="scoreRange" id="scoreRangePlus">+</button>
+                    <output for="range" id="scoreRangeOutput">50</output>
+                </div>
+                <div class="container" id="roomsRangee">
+                    Rooms:
+                    <button value="roomsRange" id="roomsRangeMinus">-</button>
+                    <input id="roomsRange" type="range" step="5" value="50">
+                    <button value="roomsRange" id="roomsRangePlus">+</button>
+                    <output for="range" id="roomsRangeOutput">50</output>
+                </div>
+                <div class="container" id="pricee">
+                    Price:
+                    <button value="priceRange" id="priceRangeMinus">-</button>
+                    <input id="priceRange" type="range" step="10" value="50">
+                    <button value="priceRange" id="priceRangePlus">+</button>
+                    <output for="range" id="priceRangeOutput">50</output>
+                </div>
+
+            </div>
+        </div>
+
     </div>
+
+        <div id="big">
+
+        </div>
 
 </body>
 </html>

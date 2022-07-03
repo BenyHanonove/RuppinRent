@@ -18,7 +18,7 @@
         $(document).ready(function () {
             $("#signIn").click(signInHerf);
             $("#logoPic").click(indexHerf);
-            $("#btn").click(addUser);
+            $("#btn").click(BuildUser);
         });
 
         function signInHerf() {
@@ -34,24 +34,29 @@
             let email = $("#emailBox").val();
             let password = $("#passwordBox").val();
             let username = $("#usernameBox").val();
+            let currentDate = new Date();
+
 
             let userData = {
-                EMAIL:email,
-                PASSWORD: password,
-                USERNAME: username
+                Email:email,
+                Password: password,
+                Username: username,
+                JoinDate: currentDate,
+                RentTotal: 0,
+                CancelTotal :0
             };
-            console.log(userData);
             addUser(userData);
-
         }
 
-        function addUser(user) {
+            function addUser(user) {
+            console.log(user);
             let api = "../api/Users";
+            localStorage.clear();
+            localStorage.setItem("user", JSON.stringify(user));
             ajaxCall("POST", api, JSON.stringify(user), addUserSuccessCB, addUserErrorCB);
         }
 
         function addUserSuccessCB(status) {
-            console.log(status);
             alert("account has been create");
             indexHerf();
         }

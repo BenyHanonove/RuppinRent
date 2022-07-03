@@ -32,8 +32,8 @@ namespace RuppinRent.Models
         public float Id { get => id; set => id = value; }
         public string Date { get => date; set => date = value; }
         public float ReviewerId { get => reviewerId; set => reviewerId = value; }
-        string ReviewerName { get => reviewerName; set => reviewerName = value; }
-        string Comments { get => commemts; set => commemts = value; }
+        public string ReviewerName { get => reviewerName; set => reviewerName = value; }
+        public string Comments { get => commemts; set => commemts = value; }
 
         public List<Review> GetReviews(float id)
         {

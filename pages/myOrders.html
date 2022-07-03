@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <link rel="stylesheet" href="../style/style1.css" />
+
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+
+    <script>
+
+        let orders;
+        let counter = 0;
+
+        $(document).ready(function () {
+            $("#signIn").click(signInHerf);
+            $("#signUp").click(signUpHerf);
+            $("#logoPic").click(indexHerf);
+            activeUser();
+            loadOrders();
+        });
+
+        function activeUser() {
+
+            if (localStorage.getItem('user') != null) {
+                 let active = JSON.parse(localStorage.getItem("user"));
+                 let str = "<p>Hello <br>";
+                 str += active.Username;
+                 str += "</p>";
+                 str += '<button id="logOut">LOG OUT</button>'
+                 $("#sign").html(str);
+                 $("#logOut").click(logOut);
+             }
+        }
+
+        function logOut() {
+            localStorage.clear();
+            indexHerf();
+        }
+
+        function signInHerf() {
+            window.location.href = 'signIn.html';
+            localStorage.setItem("house", null);
+        }
+
+        function signUpHerf() {
+            window.location.href = 'signUp.html';
+            localStorage.setItem("house", null);
+        }
+
+        function indexHerf() {
+            window.location.href = 'index.html';
+            localStorage.setItem("house", null);
+        }
+
+
+        function loadOrders() {
+            let user = JSON.parse(localStorage.getItem("user"));
+            let api = "../api/Orders?Email=" + user.Email;
+            ajaxCall("GET", api,"",getOrdersSuccessCB ,getOrdersErrorCB);
+        }
+
+        function getOrdersErrorCB(err) {
+            console.log(err);
+        }
+
+        function getOrdersSuccessCB(ordersData) {
+
+            orders = ordersData;
+            for (let i = 0; i < orders.length; i++) {
+                let id = ordersData[i].HouseId;
+                let api = "../api/Houses/" + id;
+                ajaxCall("GET", api, "", getHouseSuccessCB, getHouseErrorCB);
+            }
+
+        }
+
+        function getHouseSuccessCB(houseData) {
+            buildPage(houseData, orders[counter]);
+        }
+
+        function getHouseErrorCB(err) {
+            console.log(err);
+        }
+
+        function buildPage(house, order) {
+            let orderDate = order.OrderdFor;
+            let btnCheck = dayGap(orderDate);
+
+            let str = $("#big").html();
+
+            console.log(house);
+
+            str += "<div class='small'>";
+            str += "<img class='tiny' src=" + house.Picture + ">";
+            str += "<p>" + house.Name + "</p>";
+
+            if (btnCheck) {
+                str += "<button onclick='deleteOrder(" + house.Id + ")'>cancel</button>";
+            }
+
+            str += "</div>";
+
+            $("#big").html(str);
+            counter++;
+        }
+
+        function deleteOrder(id) {
+            let user = JSON.parse(localStorage.getItem("user"));
+            let Email = user.Email;
+            let api = "../api/Houses/" + Email+"/"+id;
+            ajaxCall("DELETE", api, "", deleteOrderSuccessCB, deleteOrderErrorCB);
+        }
+
+        function deleteOrderSuccessCB() {
+            alert("Order has removed");
+            indexHerf();
+        }
+
+        function deleteOrderErrorCB(err) {
+            console.log(err);
+        }
+
+        function dayGap(orderDate) {
+
+            let date = orderDate.split("-");
+            for (let i = 0; i < 3; i++) {
+                date[i] = date[i].toString();
+            }
+            date[2] = date[2].substring(0, 2);
+
+
+            let oDate = new Date(date[0], date[1], date[2]);
+            let currentDate = new Date();
+
+            let diffInDays = Math.round((oDate - currentDate) / (1000 * 60 * 60 * 24));
+            if (diffInDays > 14) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+
+    </script>
+
+</head>
+<body>
+
+    <div id="logo">
+
+        <div id="sign">
+            <button id="signIn">sign in</button>
+            <button id="signUp">sign up</button>
+        </div>
+
+        <img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />
+        <h1>Ruppin Rent</h1>
+    </div>
+
+
+    <div id="big">
+        <h3>MY ORDERS</h3>
+    </div>
+
+
+
+</body>
+</html>

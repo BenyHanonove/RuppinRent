@@ -16,7 +16,7 @@
 
         $(document).ready(function () {
             $("#signUp").click(signUpHerf);
-            $("#logoPic").click(indexHerf);
+            $("#logoPic").click(indexHerf); 
             $("#btn").click(LogIn);
         });
 
@@ -39,7 +39,6 @@
             let inputPassword = $("#passwordBox").val();
 
             localStorage.clear();
-            console.log(users);
 
             for (let i = 0; i < users.length; i++) {
                 if (users[i].Email == inputEmail) {

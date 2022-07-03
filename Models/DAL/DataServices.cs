@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Configuration;
 
@@ -16,18 +17,30 @@ namespace RuppinRent.Models.DAL
         {
             SqlConnection con = Connect();
 
-            //create insert command string for sql
-            string strCommand = "insert into usersHotel (email,password,username) values"+
-            "('"+u.Email+"','"+u.Password+"','"+u.Username+"'); ";
+            StringBuilder sb = new StringBuilder();
+           
+            //string strCommand = "insert into usersHotel (email,password,username) values"+
+            //"('"+u.Email+"','"+u.Password+"','"+u.Username+"'); ";
 
-            SqlCommand com = CreateCommand(strCommand, con);
-            return 1;
+            // use a string builder to create the dynamic string
+            sb.AppendFormat("Values('{0}', '{1}','{2}','{3}','{4}','{5}')", u.Email, u.Password, u.Username,u.StringDateJoin(),u.RentTotal,u.CancelTotal);
+            String prefix = "INSERT INTO Users " + "([email],[password], [username],[joinDate],[rentTotal],[cancelTotal])";
+
+            string cStr = prefix + sb.ToString();
+
+            SqlCommand command = CreateCommand(cStr, con);
+            // Execute
+            int numAffected = command.ExecuteNonQuery();
+
+            con.Close();
+
+            return numAffected;
         }
 
         public List<User> GetUsers()
         {
             SqlConnection con =Connect();
-            string commandStr = "select * from usersHotel";
+            string commandStr = "select * from Users";
             SqlCommand command = new SqlCommand(commandStr, con);
             SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);
 
@@ -38,7 +51,10 @@ namespace RuppinRent.Models.DAL
                 string email = dr["email"].ToString();
                 string password = dr["password"].ToString();
                 string username = dr["username"].ToString();
-                users.Add(new User(email, password, username));
+                DateTime joindate = Convert.ToDateTime(dr["joinDate"]);
+                int rentTotal = int.Parse(dr["rentTotal"].ToString());
+                int cancelTotal =int.Parse(dr["cancelTotal"].ToString());
+                users.Add(new User(email, password, username,joindate,rentTotal,cancelTotal));
             }
 
             return users;
@@ -55,26 +71,62 @@ namespace RuppinRent.Models.DAL
 
             while (dr.Read())
             {
-                float Id = float.Parse(dr["id"].ToString());
+                long Id =Convert.ToInt64(dr["id"]);
                 string Name =dr["name"].ToString();
                 string Description =dr["description"].ToString();
                 string Picture = dr["picture_url"].ToString();
                 string Neighbourhoood = dr["neighbourhood"].ToString();
                 string NeighbourhooodOverview = dr["neighborhood_overview"].ToString();
                 float Score = float.Parse(dr["review_scores_rating"].ToString());
-
-                houses.Add(new House(Id, Name, Description, Picture, Neighbourhoood, NeighbourhooodOverview, Score));
+                string Price = dr["price"].ToString();
+                char SuperHost = dr["host_is_superhost"].ToString()[0];
+                int MinimumNights = Convert.ToInt32(dr["minimum_nights"]);
+                int Maximum_nights = Convert.ToInt32(dr["maximum_nights"]);
+                houses.Add(new House(Id, Name, Description, Picture, Neighbourhoood,
+                    NeighbourhooodOverview, Score,Price,SuperHost,MinimumNights,Maximum_nights));
             }
 
             return houses;
 
         }
 
-        public House GetHouse(float HouseId)
+        public List<House> GetHousesByName(string name)
         {
-            string id = HouseId.ToString();
             SqlConnection con = Connect();
-            string commandStr = "select * from Houses where id = " + id;
+            string commandStr = "SELECT *"
+                                    + " FROM Houses as h"                       
+                                    + " WHERE h.name LIKE " + "'%" + name + "%';";
+            SqlCommand command = CreateCommand(commandStr, con);
+            SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);
+
+            List<House> houses = new List<House>();
+
+            while (dr.Read())
+            {
+                long Id = Convert.ToInt64(dr["id"]);
+                string Name = dr["name"].ToString();
+                string Description = dr["description"].ToString();
+                string Picture = dr["picture_url"].ToString();
+                string Neighbourhoood = dr["neighbourhood"].ToString();
+                string NeighbourhooodOverview = dr["neighborhood_overview"].ToString();
+                float Score = float.Parse(dr["review_scores_rating"].ToString());
+                string Price = dr["price"].ToString();
+                char SuperHost = dr["host_is_superhost"].ToString()[0];
+                int MinimumNights = Convert.ToInt32(dr["minimum_nights"]);
+                int Maximum_nights = Convert.ToInt32(dr["maximum_nights"]);
+
+                houses.Add(new House(Id, Name, Description, Picture, Neighbourhoood,
+                    NeighbourhooodOverview, Score, Price, SuperHost, MinimumNights, Maximum_nights));
+            }
+
+            return houses;
+
+        }
+
+        public House GetHouse(long id)
+        {
+            SqlConnection con = Connect();
+            string commandStr = "select * from Houses where id = "+id;
             SqlCommand command = CreateCommand(commandStr, con);
             SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);
 
@@ -82,17 +134,23 @@ namespace RuppinRent.Models.DAL
 
             while (dr.Read())
             {
-                float Id = float.Parse(dr["id"].ToString());
+                long Id = Convert.ToInt64(dr["id"]);
                 string Name = dr["name"].ToString();
                 string Description = dr["description"].ToString();
                 string Picture = dr["picture_url"].ToString();
                 string Neighbourhoood = dr["neighbourhood"].ToString();
                 string NeighbourhooodOverview = dr["neighborhood_overview"].ToString();
                 float Score = float.Parse(dr["review_scores_rating"].ToString());
-                house = new House(Id, Name, Description, Picture, Neighbourhoood, NeighbourhooodOverview, Score);
+                string Price = dr["price"].ToString();
+                char SuperHost = dr["host_is_superhost"].ToString()[0];
+                int MinimumNights = Convert.ToInt32(dr["minimum_nights"]);
+                int Maximum_nights = Convert.ToInt32(dr["maximum_nights"]);
+
+                house = new House(Id, Name, Description, Picture, Neighbourhoood,
+                    NeighbourhooodOverview, Score, Price, SuperHost, MinimumNights, Maximum_nights);
             }
 
-            return house; 
+            return house;
         }
 
         public List<Review> GetReviews(float houseId)
@@ -107,10 +165,10 @@ namespace RuppinRent.Models.DAL
 
             while (dr.Read())
             {
-                float listringId = (float)dr["listing_id"];
-                float Id = (float)dr["id"];
+                float listringId = float.Parse(dr["listing_id"].ToString());
+                float Id = float.Parse(dr["id"].ToString());
                 string Date = dr["date"].ToString();
-                float reviewerId = (float)dr["reviewer_id"];
+                float reviewerId = float.Parse(dr["reviewer_id"].ToString());
                 string reviewerName= dr["reviewer_name"].ToString();
                 string comments = dr["comments"].ToString();
                 reviews.Add(new Review(listringId, Id, Date, reviewerId, reviewerName, comments));
@@ -145,6 +203,85 @@ namespace RuppinRent.Models.DAL
             con.Open();
             return con;
         }
+
+
+
+
+
+
+
+
+        public int InsertOrder(Order o)
+        {
+            SqlConnection con = Connect();
+
+            string commStr = "INSERT INTO Orders (houseId,email,orderdIn,orderFor)"+
+            "values("+o.HouseId+",'"+o.Email+"', '"+o.StringDateIn()+"', '"+o.StringDateFor()+"')"; 
+
+            SqlCommand command = CreateCommand(commStr, con);
+            // Execute
+            int numAffected = command.ExecuteNonQuery();
+
+            con.Close();
+
+            return numAffected;
+        }
+
+
+        public List<Order> GetOrders(string e)
+        {
+            SqlConnection con = Connect();
+            string commandStr = "select * from Orders where email = '"+e+"'";
+            SqlCommand command = new SqlCommand(commandStr, con);
+            SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);
+
+            List<Order> orders = new List<Order>();
+
+            while (dr.Read())
+            {
+                string email = dr["email"].ToString();
+                long houseId =Convert.ToInt64(dr["houseId"]);
+                DateTime orderedIn = Convert.ToDateTime(dr["orderdIn"]);
+                DateTime orderFor = Convert.ToDateTime(dr["orderFor"]);
+                orders.Add(new Order(email, houseId, orderedIn,orderFor));
+            }
+
+            return orders;
+        }
+
+
+        public int DeleteOrder(string email,long id)
+        {
+            SqlConnection con = Connect();
+
+            string commStr = "delete from Orders where houseId =" +id +" and email = '"+email+"'";
+
+            SqlCommand command = CreateCommand(commStr, con);
+            // Execute
+            int numAffected = command.ExecuteNonQuery();
+
+            con.Close();
+
+            return numAffected;
+        }
+
+
+        public int RentUpdatePlus(string email)
+        {
+            SqlConnection con = Connect();
+
+            string commStr = "update Users set rentTotal=rentTotal +1"+ 
+            "where email = '"+email+"'";
+
+            SqlCommand command = CreateCommand(commStr, con);
+            // Execute
+            int numAffected = command.ExecuteNonQuery();
+
+            con.Close();
+
+            return numAffected;
+        }
+
 
     }
 }

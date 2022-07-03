@@ -8,15 +8,22 @@ namespace RuppinRent.Models
 {
     public class House
     {
-        float id;
+        long id;
         string name;
         string description;
         string picture;
         string neighbourhoood;
         string neighbourhooodOverview;
-        float score; 
+        float score;
+        string price;
+        char superHost;
+        int minimumNights;
+        int maximumNights;
 
-        public House(float Id ,string Name ,string Description ,string Picture , string Neighbourhoood ,string NeighbourhooodOverview ,float Score)
+
+        public House(long Id ,string Name ,string Description ,string Picture , string Neighbourhoood ,
+            string NeighbourhooodOverview ,float Score ,string Price , char SuperHost ,
+            int MinimumNights , int MaximumNights)
         {
             this.id = Id;
             this.name = Name;
@@ -25,18 +32,25 @@ namespace RuppinRent.Models
             this.neighbourhoood = Neighbourhoood;
             this.neighbourhooodOverview = NeighbourhooodOverview;
             this.score = Score;
-
+            this.price = Price;
+            this.superHost = SuperHost;
+            this.minimumNights = MinimumNights;
+            this.maximumNights = MaximumNights;
         }
 
         public House() { }
 
-        public float Id { get => id; set => id = value; }
+        public long Id { get => id; set => id = value; }
         public string Name { get => name; set => name = value; }
         public string Description { get => description; set => description = value; }
         public string Picture { get => picture; set => picture = value; }
         public string Neighbourhoood { get => neighbourhoood; set => neighbourhoood = value; }
         public string NeighbourhooodOverview { get => neighbourhooodOverview; set => neighbourhooodOverview = value; }
         public float Score { get => score; set => score = value; }
+        public string Price { get => price; set => price = value; } 
+        public char SuperHost { get => superHost; set => superHost = value; }   
+        public int MinimumNights { get => minimumNights; set => minimumNights = value; }
+        public int MaximumNights { get => maximumNights; set => maximumNights = value; }
 
         public List<House> GetHouses()
         {
@@ -45,7 +59,14 @@ namespace RuppinRent.Models
             return houses;
         }
 
-        public House GetHouse(float id)
+        public List<House> GetHousesByName(string name)
+        {
+            DataServices ds = new DataServices();
+            List<House> houses = ds.GetHousesByName(name);
+            return houses;
+        }
+
+        public House GetHouse(long id)
         {
             DataServices ds = new DataServices();
             House house = ds.GetHouse(id);

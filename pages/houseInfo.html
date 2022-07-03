@@ -15,6 +15,9 @@
 
     <script>
 
+        let houseData;
+        let reviews;
+
         $(document).ready(function () {
             $("#signIn").click(signInHerf);
             $("#signUp").click(signUpHerf);
@@ -23,43 +26,16 @@
             loadHouse();
         });
 
-        function loadHouse(id) {
-            id = 9410136;
-
-            let api = "../api/Houses/"+id;
-            ajaxCall("GET", api, "", getHouseSuccessCB, getHouseErrorCB);
-
-        }
-
-        function buildPage(house) {
-            let str = "";
-            str += "<h1>" + house.Name + "</h1>";
-            str += "<div id=right>"
-            str += "<img src=" + house.Picture + ">";
-            str += "</div>"
-            $("#big").html(str);
-        }
-
-
-        function getHouseSuccessCB(house) {
-            console.log(house);
-            buildPage(house);
-        }
-
-        function getHouseErrorCB(err) {
-            console.log(err);
-        }
-
         function activeUser() {
-            if (localStorage.getItem("user") == 'undefined') {
-                let active = JSON.parse(localStorage.getItem("user"));
-                let str = "<p>Hello <br>";
-                str += active.Username;
-                str += "</p>";
-                str += '<button id="logOut">LOG OUT</button>'
-                $("#sign").html(str);
-                $("#logOut").click(logOut);
-            }
+            if (localStorage.getItem('user') != null) {
+                 let active = JSON.parse(localStorage.getItem("user"));
+                 let str = "<p>Hello <br>";
+                 str += active.Username;
+                 str += "</p>";
+                 str += '<button id="logOut">LOG OUT</button>'
+                 $("#sign").html(str);
+                 $("#logOut").click(logOut);
+             }
         }
 
         function logOut() {
@@ -67,19 +43,146 @@
             indexHerf();
         }
 
-
         function signInHerf() {
             window.location.href = 'signIn.html';
+            localStorage.setItem("house", null);
         }
 
         function signUpHerf() {
             window.location.href = 'signUp.html';
+            localStorage.setItem("house", null);
         }
 
         function indexHerf() {
             window.location.href = 'index.html';
+            localStorage.setItem("house", null);
         }
 
+        function loadHouse() {
+            let id = localStorage.getItem("house");
+            let newId = Number(id);
+
+            let api = "../api/Houses/" + id ;
+            ajaxCall("GET", api, "", getHouseSuccessCB, getHouseErrorCB);
+
+        }
+
+        function getHouseSuccessCB(house) {
+            houseData = house;
+            let str = "";
+            str += "<div id=left>";
+            str += "<h1>Aprtment score:" + house.Score + "★</h1>";
+            str += "<img src=" + house.Picture + ">";
+            str += "</div>";
+
+            str += "<div id=right>";
+            str += "<h1>" + house.Name + "</h1>";
+            str += "<p>Description: " + house.Description + "</p><br>";
+            str += "<h3>About the Neighbourhoood:</h3>";
+            str += "<p>" + house.Neighbourhoood + ":" + house.NeighbourhooodOverview + "</p>";
+
+            if (localStorage.getItem('user') != null) {
+                str += "<button onclick='DateChoose()'>Order</button>";
+            }
+            str += "</div>";
+
+            $("#big").html(str);
+            loadReviews(house);
+        }
+
+        function getHouseErrorCB(err) {
+            console.log(err);
+        }
+
+
+        function loadReviews(house) {
+            let id = house.Id;
+            let api = "../api/Reviews/"+ id;
+            ajaxCall("GET", api, "", getReviewsSuccessCB, getReviewsErrorCB);
+        }
+
+        function getReviewsSuccessCB(reviews) {
+            buildReviewsLog(reviews);
+        }
+
+        function getReviewsErrorCB(err) {
+            console.log(err);
+        }
+
+        function buildReviewsLog(reviews){
+
+            let str = "<h3>Reviews:</h3>";
+
+            for (let i = 0; i<reviews.length; i++) {
+                str += "<div class='reviews'>";
+                str += "<p>" + reviews[i].ReviewerName +" "+ reviews[i].Date+ ":</p>";
+                str += "<p>" + reviews[i].Comments + "</p>";
+                str += "</div>";
+            }
+
+            console.log(reviews);
+
+            $("#reviews").html(str);
+        }
+
+        function DateChoose() {
+            let str = "";
+            str += "<div id=right>";
+            str += "<h1>" + houseData.Name + "</h1>";
+            str += "<h3>Please Select Date:</h3>";
+            str += "<input type='date' id='order4' name='Enter date:'>";
+            str += "<button onclick='BuildOrder()'>Sumit</button>"
+
+            $("#right").html(str);
+            $("#reviews").html("");
+        }
+
+        function BuildOrder() {
+            let OrderFor = document.getElementById('order4').value;
+
+            let email = JSON.parse(localStorage.getItem("user")).Email;
+            let currentDate = new Date();
+
+            let orderData = {
+                Email:email,
+                houseId: houseData.Id,
+                orderdIn: currentDate,
+                orderdFor: OrderFor
+            };
+
+            addOrder(orderData);
+        }
+
+        function addOrder(order) {
+            let api = "../api/Orders";
+            ajaxCall("POST", api, JSON.stringify(order), addOrderSuccessCB, addOrderErrorCB);
+        }
+
+
+        function addOrderSuccessCB(status) {
+            alert("your order has been added");
+            updateCounter();
+        }
+
+        function updateCounter() {
+            let email = JSON.parse(localStorage.getItem("user")).Email;
+            let api = "../api/Users/"+ email;
+            ajaxCall("PUT", api,"", updateCounterSuccessCB, updateCounterErrorCB);
+        }
+
+        function updateCounterSuccessCB() {
+            alert("order added to user");
+            indexHerf();
+        }
+
+        function updateCounterErrorCB(err) {
+            console.log(err);
+            alert("fail");
+        }
+
+        function addOrderErrorCB(err) {
+            console.log(err);
+        }
 
     </script>
 
@@ -100,6 +203,10 @@
 
     <div id="big">
        
+    </div>
+
+    <div id="reviews">
+
     </div>
 
 </body>

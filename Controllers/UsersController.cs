@@ -18,14 +18,20 @@ namespace RuppinRent.Controllers
             return users;
         }
 
+        // POST api/<controller>
         public int Post([FromBody] User user)
         {
-            return user.InsertUser();
+            user.InsertUser();
+            return 1;
         }
 
         // PUT api/<controller>/5
-        public void Put(int id, [FromBody] string value)
+        [System.Web.Http.Route("api/Users/{Email}")]
+        public int Put(string Email)
         {
+            User user = new User();
+            user.UpdateRentPlus(Email);
+            return 1;
         }
 
 
