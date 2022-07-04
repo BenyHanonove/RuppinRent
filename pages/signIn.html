@@ -1,6 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+
     <meta charset="utf-8" />
     <title></title>
     <link rel="stylesheet" href="../style/style1.css" />
@@ -46,7 +47,7 @@
                         alert("Hello " + users[i].Username);
                         let active = JSON.stringify(users[i]);
                         localStorage.setItem("user", active);
-                        indexHerf();
+                        console.log(active);
                     }
                 }
             }

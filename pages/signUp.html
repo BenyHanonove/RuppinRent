@@ -52,7 +52,6 @@
             console.log(user);
             let api = "../api/Users";
             localStorage.clear();
-            localStorage.setItem("user", JSON.stringify(user));
             ajaxCall("POST", api, JSON.stringify(user), addUserSuccessCB, addUserErrorCB);
         }
 

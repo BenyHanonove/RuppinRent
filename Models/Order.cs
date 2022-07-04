@@ -12,24 +12,29 @@ namespace RuppinRent.Models
         long houseId;
         DateTime orderdIn;
         DateTime orderdFor;
+        int id; 
+        DateTime orderdOut;
 
         public Order() { }
 
 
-        public Order(string Email, long HouseId,DateTime OrderFor)
+        public Order(string Email, long HouseId,DateTime OrderFor ,DateTime OrderOut)
         {
             this.email = Email;
             this.houseId = HouseId;
             this.orderdIn = DateTime.Now;
             this.orderdFor = OrderFor;
+            this.orderdOut = OrderOut;
         }
 
-        public Order(string Email, long HouseId,DateTime OrderdIn, DateTime OrderFor)
+        public Order(string Email, long HouseId,DateTime OrderdIn, DateTime OrderFor , int Id ,DateTime OrderOut)
         {
             this.email = Email;
             this.houseId = HouseId;
             this.orderdIn = OrderdIn;
             this.orderdFor = OrderFor;
+            this.id = Id;
+            this.orderdOut= OrderOut;
         }
 
 
@@ -37,6 +42,9 @@ namespace RuppinRent.Models
         public long HouseId { get => houseId; set => houseId = value; }
         public DateTime OrderdIn { get => orderdIn; set => orderdIn = value; }
         public DateTime OrderdFor { get => orderdFor; set => orderdFor = value; }
+        public int Id { get => id; set => id = value; }
+        public DateTime OrderdOut { get => orderdOut; set => orderdOut = value; }
+
 
         public string StringDateIn()
         {
@@ -55,6 +63,16 @@ namespace RuppinRent.Models
             str += this.orderdFor.Day.ToString();
             return str;
         }
+
+        public string StringDateOut()
+        {
+            string str = "";
+            str += this.orderdOut.Year.ToString() + "-";
+            str += this.orderdOut.Month.ToString() + "-";
+            str += this.orderdOut.Day.ToString();
+            return str;
+        }
+
         public int InserOrder()
         {
             DataServices ds = new DataServices();

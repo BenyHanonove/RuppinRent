@@ -109,7 +109,7 @@
             console.log(err);
         }
 
-        function buildReviewsLog(reviews){
+        function buildReviewsLog(reviews) {
 
             let str = "<h3>Reviews:</h3>";
 
@@ -129,8 +129,12 @@
             let str = "";
             str += "<div id=right>";
             str += "<h1>" + houseData.Name + "</h1>";
-            str += "<h3>Please Select Date:</h3>";
-            str += "<input type='date' id='order4' name='Enter date:'>";
+            str += "<h3>Please Select Dates</h3>";
+            str += "<h4>enter start date :<h4>"
+            str += "<input type='date' id='order4'>";
+            str += "<br>";
+            str +="<h4>enter end date :<h4>"
+            str += "<input type='date' id='order4end'>";
             str += "<button onclick='BuildOrder()'>Sumit</button>"
 
             $("#right").html(str);
@@ -138,19 +142,31 @@
         }
 
         function BuildOrder() {
-            let OrderFor = document.getElementById('order4').value;
 
             let email = JSON.parse(localStorage.getItem("user")).Email;
+            let OrderFor = document.getElementById('order4').value;
+            let OrderEnd = document.getElementById('order4end').value;
             let currentDate = new Date();
 
-            let orderData = {
-                Email:email,
-                houseId: houseData.Id,
-                orderdIn: currentDate,
-                orderdFor: OrderFor
-            };
+            if (dayGap(OrderFor, currentDate) > 0) {
+                if (dayGap(OrderEnd, OrderFor) > 0) {
+                    let orderData = {
+                        Email: email,
+                        houseId: houseData.Id,
+                        orderdIn: currentDate,
+                        orderdFor: OrderFor,
+                        orderdOut: OrderEnd
+                    };
+                    addOrder(orderData);
+                }
+                else{
+                    alert("end day has to be bigger then start day");
+                }
+            }
+            else{
+                alert("start date is outdated");
+            }
 
-            addOrder(orderData);
         }
 
         function addOrder(order) {
@@ -165,9 +181,10 @@
         }
 
         function updateCounter() {
-            let email = JSON.parse(localStorage.getItem("user")).Email;
-            let api = "../api/Users/"+ email;
-            ajaxCall("PUT", api,"", updateCounterSuccessCB, updateCounterErrorCB);
+            let active = JSON.parse(localStorage.getItem("user"));
+            let Id = active.id;
+            let api = "..api/Users/" +Id;
+            ajaxCall("PUT", api, "", updateCounterSuccessCB, updateCounterErrorCB);
         }
 
         function updateCounterSuccessCB() {
@@ -183,6 +200,13 @@
         function addOrderErrorCB(err) {
             console.log(err);
         }
+
+        function dayGap(big, small) {
+            let diffInDays = Math.round((big - small) / (1000 * 60 * 60 * 24));
+            return diffInDays;
+        }
+
+
 
     </script>
 

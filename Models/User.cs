@@ -15,10 +15,10 @@ namespace RuppinRent.Models
         DateTime joinDate;
         int rentTotal;
         int cancelTotal;
-
+        int id;
         public User() { }
 
-        public User(string Email , string Password, string Username)
+        public User(string Email ,string Password ,string Username ,int ID)
         {
             this.email = Email;
             this.password = Password;
@@ -26,9 +26,10 @@ namespace RuppinRent.Models
             this.joinDate = DateTime.Now;
             this.rentTotal = 0;
             this.cancelTotal = 0;
+            this.id = 0;
         }
 
-        public User(string Email, string Password, string Username ,DateTime JoinDate,int RentTotal,int CancelTotal)
+        public User(string Email, string Password, string Username ,DateTime JoinDate,int RentTotal,int CancelTotal ,int Id)
         {
             this.email = Email;
             this.password = Password;
@@ -36,6 +37,7 @@ namespace RuppinRent.Models
             this.joinDate = JoinDate;
             this.rentTotal = RentTotal;
             this.cancelTotal = CancelTotal;
+            this.id=Id;
         }
 
         public string Email { get => email; set => email = value; }
@@ -44,6 +46,9 @@ namespace RuppinRent.Models
         public DateTime JoinDate { get => joinDate; set => joinDate = value; }
         public int RentTotal { get => rentTotal; set => rentTotal = value; }
         public int CancelTotal { get => cancelTotal; set => cancelTotal = value; }
+        public int Id { get => id; set => id = value; }
+
+
 
         public string StringDateJoin()
         {
@@ -68,10 +73,10 @@ namespace RuppinRent.Models
             return 1;
         }
 
-        public int UpdateRentPlus(string email)
+        public int UpdateRentPlus(int id)
         {
             DataServices ds = new DataServices();
-            ds.RentUpdatePlus(email);
+            ds.RentUpdatePlus(id);
             return 1;
         }
     }

@@ -54,7 +54,8 @@ namespace RuppinRent.Models.DAL
                 DateTime joindate = Convert.ToDateTime(dr["joinDate"]);
                 int rentTotal = int.Parse(dr["rentTotal"].ToString());
                 int cancelTotal =int.Parse(dr["cancelTotal"].ToString());
-                users.Add(new User(email, password, username,joindate,rentTotal,cancelTotal));
+                int id = int.Parse(dr["id"].ToString());
+                users.Add(new User(email, password, username,joindate,rentTotal,cancelTotal,id));
             }
 
             return users;
@@ -215,8 +216,8 @@ namespace RuppinRent.Models.DAL
         {
             SqlConnection con = Connect();
 
-            string commStr = "INSERT INTO Orders (houseId,email,orderdIn,orderFor)"+
-            "values("+o.HouseId+",'"+o.Email+"', '"+o.StringDateIn()+"', '"+o.StringDateFor()+"')"; 
+            string commStr = "INSERT INTO Orders (houseId,email,orderdIn,orderFor,orderdOut)" +
+            "values("+o.HouseId+",'"+o.Email+"', '"+o.StringDateIn()+"', '"+o.StringDateFor()+"','"+ o.StringDateOut()+"')"; 
 
             SqlCommand command = CreateCommand(commStr, con);
             // Execute
@@ -243,7 +244,9 @@ namespace RuppinRent.Models.DAL
                 long houseId =Convert.ToInt64(dr["houseId"]);
                 DateTime orderedIn = Convert.ToDateTime(dr["orderdIn"]);
                 DateTime orderFor = Convert.ToDateTime(dr["orderFor"]);
-                orders.Add(new Order(email, houseId, orderedIn,orderFor));
+                int id = Convert.ToInt32(dr["id"]);
+                DateTime orderdOut = Convert.ToDateTime(dr["orderdOut"]);
+                orders.Add(new Order(email, houseId, orderedIn,orderFor,id,orderdOut));
             }
 
             return orders;
@@ -266,12 +269,12 @@ namespace RuppinRent.Models.DAL
         }
 
 
-        public int RentUpdatePlus(string email)
+        public int RentUpdatePlus(int id)
         {
             SqlConnection con = Connect();
 
             string commStr = "update Users set rentTotal=rentTotal +1"+ 
-            "where email = '"+email+"'";
+            "where id = '"+id+"'";
 
             SqlCommand command = CreateCommand(commStr, con);
             // Execute
