@@ -87,6 +87,13 @@ namespace RuppinRent.Models
             return orders;
         }
 
+        public List<Order> GetOrders(long Id)
+        {
+            DataServices ds = new DataServices();
+            List<Order> orders = ds.GetOrders(Id);
+            return orders;
+        }
+
         public int DeleteOrder(string e , long id)
         {
             DataServices ds =new DataServices();

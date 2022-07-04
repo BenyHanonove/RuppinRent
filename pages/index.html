@@ -138,6 +138,7 @@
 
     <script>
 
+
         $(document).ready(function () {
             localStorage.removeItem("house");
             $("#signIn").click(signInHerf);
@@ -147,6 +148,7 @@
             loadHouses();
             filterFunction();
         });
+
 
         function loadHouses() {
             let api = "../api/Houses";
@@ -184,7 +186,6 @@
             $("#big").html(str);
         }
 
-
         function getHousesErrorCB(err) {
             console.log(err);
         }
@@ -197,7 +198,7 @@
         }
 
         function activeUser() {
- 
+            
             if (localStorage.getItem("user") != null) {
                 let active = JSON.parse(localStorage.getItem("user"));
                 let str = "<p>Hello <br>";
@@ -232,12 +233,10 @@
         }
 
         function getHouseNameSuccessCB(houses) {
-            console.log(houses);
             let str = "<h1> Results : </h1>";
             let counter = 0;
 
             for (var i = 0; i < houses.length; i++) {
-
 
                 str += "<div class='small'>";
                 str += "<img class='tiny' src=" + houses[i].Picture + ">";

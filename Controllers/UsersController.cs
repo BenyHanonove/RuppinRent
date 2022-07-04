@@ -28,7 +28,7 @@ namespace RuppinRent.Controllers
 
         // PUT api/<controller>/5
         [System.Web.Http.HttpPut]
-        [System.Web.Http.Route("api/Users/Id")]
+        [System.Web.Http.Route("api/Users/{Id}")]
         public int Put(int Id)
         {
             User user = new User();

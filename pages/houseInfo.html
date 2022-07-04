@@ -16,7 +16,9 @@
     <script>
 
         let houseData;
-        let reviews;
+        let maxDays;
+        let minDays;
+        let HouseOrders;
 
         $(document).ready(function () {
             $("#signIn").click(signInHerf);
@@ -69,6 +71,10 @@
 
         function getHouseSuccessCB(house) {
             houseData = house;
+
+            maxDays = house.MaximumNights;
+            minDays = house.MinimumNights;
+
             let str = "";
             str += "<div id=left>";
             str += "<h1>Aprtment score:" + house.Score + "★</h1>";
@@ -120,9 +126,20 @@
                 str += "</div>";
             }
 
-            console.log(reviews);
-
             $("#reviews").html(str);
+
+            let id = houseData.Id;
+            let api = "../api/Orders/" + id;
+            ajaxCall("GET", api, "", getOrdersSuccessCB, getOrdersErrorCB);
+
+        }
+
+        function getOrdersSuccessCB(orders) {
+            HouseOrders = orders;
+        }
+
+        function getOrdersErrorCB(err) {
+            console.log(err);
         }
 
         function DateChoose() {
@@ -135,37 +152,106 @@
             str += "<br>";
             str +="<h4>enter end date :<h4>"
             str += "<input type='date' id='order4end'>";
-            str += "<button onclick='BuildOrder()'>Sumit</button>"
-
+            str += "<button onclick='BuildOrder()'>Sumit</button>";
             $("#right").html(str);
+
+
+            str = "<h4>orders for this house:<h4>";
+            str += "<table><tr><td>order start</td><td>order end</td></tr>";
+            for (let i = 0; i < HouseOrders.length;i++) {
+
+                let date1 = (HouseOrders[i].OrderdFor).split("-");
+                for (let i = 0; i < 3; i++) {
+                    date1[i] = date1[i].toString();
+                }
+                date1[2] = date1[2].substring(0, 2);
+
+                date1 = date1[2] + "/" + date1[1] + "/"+ date1[0];
+
+                let date2 = (HouseOrders[i].OrderdOut).split("-");
+                for (let i = 0; i < 3; i++) {
+                    date2[i] = date2[i].toString();
+                }
+                date2[2] = date2[2].substring(0, 2);
+
+                date2 = date2[2] + "/" + date2[1] + "/" + date2[0];
+
+
+                str += "<tr><td>" + date1 + "</td><td>" + date2 + "</td></tr>";
+
+
+            }
+
+            $("#dates").html(str);
             $("#reviews").html("");
         }
 
         function BuildOrder() {
 
+       
             let email = JSON.parse(localStorage.getItem("user")).Email;
-            let OrderFor = document.getElementById('order4').value;
-            let OrderEnd = document.getElementById('order4end').value;
-            let currentDate = new Date();
+            let OrderFor = $("#order4").val();
+            let OrderEnd = $("#order4end").val()
 
-            if (dayGap(OrderFor, currentDate) > 0) {
-                if (dayGap(OrderEnd, OrderFor) > 0) {
-                    let orderData = {
-                        Email: email,
-                        houseId: houseData.Id,
-                        orderdIn: currentDate,
-                        orderdFor: OrderFor,
-                        orderdOut: OrderEnd
-                    };
-                    addOrder(orderData);
-                }
-                else{
-                    alert("end day has to be bigger then start day");
+            let currentDate = new Date();
+            let start = dateTransfer(OrderFor);
+            let end = dateTransfer(OrderEnd);
+
+            let dateDiff = (end - start) / (1000 * 60 * 60 * 24);
+            console.log(dateDiff);
+
+            //arr with all the dates that can't be used
+            invaildArr = DatesBtweenOrders();
+            userDates = DatesBtweenUser(start, end);
+
+
+            let dateCheck = false;
+            for (let j = 0; j < userDates.length; j++) {
+
+                for (let i = 0; i < invaildArr.length; i++) {
+
+                    if (userDates[j] == invaildArr[i]) {
+                        dateCheck == true;
+                        break;
+                    }
                 }
             }
-            else{
-                alert("start date is outdated");
+
+            //check if the days the user put are vaild 
+            // and can be orderd
+            if (dateCheck == false) {
+                if (start > currentDate) {
+                    if (dateDiff >0) {
+                        if (dateDiff >= minDays) {
+                            if (dateDiff <= maxDays) {
+                                let orderData = {
+                                    Email: email,
+                                    houseId: houseData.Id,
+                                    orderdIn: currentDate,
+                                    orderdFor: OrderFor,
+                                    orderdOut: OrderEnd
+                                };
+                                addOrder(orderData);
+                            }
+                            else {
+                                alert("your order is to long the max days are " + maxDays);
+                            }
+                        }
+                        else {
+                            alert("order has to be longer then " + minDays + " days");
+                        }
+                    }
+                    else {
+                        alert("end day has to be bigger then start day");
+                    }
+                }
+                else {
+                    alert("start date is outdated");
+                }
+            } else {
+                alert("there is order in this date");
             }
+
 
         }
 
@@ -177,7 +263,7 @@
 
         function addOrderSuccessCB(status) {
             alert("your order has been added");
-            updateCounter();
+            indexHerf();
         }
 
         function updateCounter() {
@@ -188,26 +274,61 @@
         }
 
         function updateCounterSuccessCB() {
-            alert("order added to user");
-            indexHerf();
+            alert("counter has been updated");
         }
 
         function updateCounterErrorCB(err) {
             console.log(err);
-            alert("fail");
         }
 
         function addOrderErrorCB(err) {
             console.log(err);
         }
 
-        function dayGap(big, small) {
-            let diffInDays = Math.round((big - small) / (1000 * 60 * 60 * 24));
-            return diffInDays;
+
+        function DatesBtweenOrders() {
+            DatesArr = [];
+
+            for (let i = 0; i < HouseOrders.length; i++) {
+                let start = new Date(HouseOrders[i].OrderdFor);
+                let end = new Date(HouseOrders[i].OrderdOut);
+
+                while (start <= end) {
+                    DatesArr.push(new Date(start));
+                    start.setDate(start.getDate()+1)
+                }
+
+            }
+
+            return DatesArr;
+        }
+
+        function DatesBtweenUser(start,end) {
+            DatesArr = [];
+
+            while (start <= end) {
+                DatesArr.push(new Date(start));
+                start.setDate(start.getDate() + 1)
+
+            }
+
+            return DatesArr;
         }
 
 
+        function dateTransfer(date) {
+            let  newDate= date.split("-");
+            for (let i = 0; i < 3; i++) {
+                newDate[i] = newDate[i].toString();
+            }
+            newDate[2] = newDate[2].substring(0, 2);
 
+
+            let oDate = new Date(newDate[0], newDate[1], newDate[2]);
+            return oDate;
+        }
+
+        
     </script>
 
 
@@ -233,5 +354,8 @@
 
     </div>
 
+    <div id="dates">
+
+    </div>
 </body>
 </html>

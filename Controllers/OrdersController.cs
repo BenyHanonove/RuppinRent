@@ -19,6 +19,16 @@ namespace RuppinRent.Controllers
             return orders;
         }
 
+
+
+        public IEnumerable<Order> Get(long id)
+        {
+            Order o = new Order();
+            List<Order> orders = o.GetOrders(id);
+            return orders;
+        }
+
+
         // POST api/<controller>
         public int Post([FromBody] Order order)
         {

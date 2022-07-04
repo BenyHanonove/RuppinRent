@@ -253,6 +253,30 @@ namespace RuppinRent.Models.DAL
         }
 
 
+        public List<Order> GetOrders(long Id)
+        {
+            SqlConnection con = Connect();
+            string commandStr = "select * from Orders where houseId = '" + Id + "'";
+            SqlCommand command = new SqlCommand(commandStr, con);
+            SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);
+
+            List<Order> orders = new List<Order>();
+
+            while (dr.Read())
+            {
+                string email = dr["email"].ToString();
+                long houseId = Convert.ToInt64(dr["houseId"]);
+                DateTime orderedIn = Convert.ToDateTime(dr["orderdIn"]);
+                DateTime orderFor = Convert.ToDateTime(dr["orderFor"]);
+                int id = Convert.ToInt32(dr["id"]);
+                DateTime orderdOut = Convert.ToDateTime(dr["orderdOut"]);
+                orders.Add(new Order(email, houseId, orderedIn, orderFor, id, orderdOut));
+            }
+
+            return orders;
+        }
+
+
         public int DeleteOrder(string email,long id)
         {
             SqlConnection con = Connect();
