@@ -263,18 +263,28 @@
 
         function addOrderSuccessCB(status) {
             alert("your order has been added");
-            indexHerf();
+            updateCounter();
         }
 
         function updateCounter() {
-            let active = JSON.parse(localStorage.getItem("user"));
-            let Id = active.id;
-            let api = "..api/Users/" +Id;
-            ajaxCall("PUT", api, "", updateCounterSuccessCB, updateCounterErrorCB);
+            let user = JSON.parse(localStorage.getItem("user"));
+
+            let data = {
+                email: user.Email,
+                password: user.Password,
+                username: user.Username,
+                joinDate: user.JoinDate,
+                rentTotal: user.RentTotal ,
+                cancelTotal: user.CancelTotal,
+                id: user.Id
+            }
+            console.log(data)
+            let api = "../api/Users/data";
+            ajaxCall("PUT", api, JSON.stringify(data), updateCounterSuccessCB, updateCounterErrorCB);
         }
 
         function updateCounterSuccessCB() {
-            alert("counter has been updated");
+           indexHerf();
         }
 
         function updateCounterErrorCB(err) {

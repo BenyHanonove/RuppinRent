@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="../style/style1.css" />
 
     <script src="../Scripts/ajaxCalls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -31,24 +32,29 @@
         }
 
         function BuildUser() {
-            let email = $("#emailBox").val();
-            let password = $("#passwordBox").val();
-            let username = $("#usernameBox").val();
+            let email = document.getElementById('emailBox');
+            let password = document.getElementById('passwordBox');
+            let username = document.getElementById('usernameBox');
             let currentDate = new Date();
 
-
-            let userData = {
-                Email:email,
-                Password: password,
-                Username: username,
-                JoinDate: currentDate,
-                RentTotal: 0,
-                CancelTotal :0
-            };
-            addUser(userData);
+            if (ValidateEmail(email)) {
+                if (password_validation(password, 6, 12)) {
+                    if (alphanumeric(username, 7, 12)) {
+                        let userData = {
+                            Email: email.value,
+                            Password: password.value,
+                            Username: username.value,
+                            JoinDate: currentDate,
+                            RentTotal: 0,
+                            CancelTotal: 0
+                        };
+                        addUser(userData);
+                    }
+                }
+            }
         }
 
-            function addUser(user) {
+        function addUser(user) {
             console.log(user);
             let api = "../api/Users";
             localStorage.clear();
@@ -56,12 +62,79 @@
         }
 
         function addUserSuccessCB(status) {
-            alert("account has been create");
+            swal({
+                title: 'Congratulations, you have successfully registered',
+                icon: "success",
+                type: "success"
+            }).then(function () {
+                indexHerf();
+            });
             indexHerf();
         }
 
-        function addUserErrorCB(err){
+        function addUserErrorCB(err) {
             console.log(err);
+        }
+
+        function password_validation(password, my, mx) {
+            var password_len = password.value.length;
+            if (password_len == 0 || password_len < my || password_len > mx) {
+                swal({
+                    title: "Password should not be empty / length be between " + my + " to " + mx,
+                    text: 'try again!',
+                    icon: "error",
+                    type: 'error'
+                })
+                password.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function ValidateEmail(email) {
+            var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+            if (email.value.match(mailformat)) {
+                return true;
+            }
+            else {
+                swal({
+                    title: "You have entered an invalid email address!",
+                    text: 'try again!',
+                    icon: "error",
+                    type: 'error'
+                })
+                email.focus();
+                return false;
+            }
+        }
+
+        function alphanumeric(username, my, mx) {
+            var letters = /^[0-9a-zA-Z]+$/;
+            var username_len = username.value.length;
+
+            if (username.value.match(letters)) {
+                if (username_len == 0 || username_len < my || username_len > mx) {
+                    swal({
+                        title: "Username should not be empty / length be between " + mx + " to " + my,
+                        text: 'try again!',
+                        icon: "error",
+                        type: 'error'
+                    })
+                    username.focus();
+                    return false;
+                }
+                return true;
+            }
+            else {
+                swal({
+                    title: 'Username must have alphanumeric characters only',
+                    text: 'try again!',
+                    icon: "error",
+                    type: 'error'
+                })
+                username.focus();
+                return false;
+            }
         }
 
 

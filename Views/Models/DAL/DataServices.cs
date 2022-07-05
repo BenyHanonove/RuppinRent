@@ -297,7 +297,9 @@ namespace RuppinRent.Models.DAL
         {
             SqlConnection con = Connect();
 
-            string commStr = "UPDATE Users SET rentTotal = RentTotal + 1 where id =" + u.Id;
+            string commStr = "UPDATE Users " +
+                "SET rentTotal =" + u.RentTotal +" +1 " +
+                " where id = " + u.Id + "";
 
             SqlCommand command = CreateCommand(commStr, con);
             // Execute

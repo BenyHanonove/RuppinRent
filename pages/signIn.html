@@ -6,18 +6,19 @@
     <title></title>
     <link rel="stylesheet" href="../style/style1.css" />
 
+
     <script src="../Scripts/ajaxCalls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-            crossorigin="anonymous">
-    </script>
+            crossorigin="anonymous"></script>
 
     <script>
 
         $(document).ready(function () {
             $("#signUp").click(signUpHerf);
-            $("#logoPic").click(indexHerf); 
+            $("#logoPic").click(indexHerf);
             $("#btn").click(LogIn);
         });
 
@@ -33,9 +34,10 @@
             let api = "../api/Users";
             ajaxCall("GET", api, "", getUsersSuccessCB, getUsersErrorCB);
         }
-        
+
         function getUsersSuccessCB(users) {
 
+            let error = 1;
             let inputEmail = $("#emailBox").val();
             let inputPassword = $("#passwordBox").val();
 
@@ -44,12 +46,27 @@
             for (let i = 0; i < users.length; i++) {
                 if (users[i].Email == inputEmail) {
                     if (users[i].Password == inputPassword) {
-                        alert("Hello " + users[i].Username);
+                        swal({
+                            title: 'Congratulations, you have successfully logged in!',
+                            text: "Hello " + users[i].Username,
+                            icon: "success",
+                            type: "success"
+                        }).then(function () {
+                            indexHerf();
+                        });
                         let active = JSON.stringify(users[i]);
                         localStorage.setItem("user", active);
-                        console.log(active);
+                        error = 0;
                     }
                 }
+            }
+            if (error == 1) {
+                swal({
+                    title: 'Invalid username or password',
+                    text: 'try again!',
+                    icon: "error",
+                    type: 'error'
+                })
             }
 
         }

@@ -1,4 +1,4 @@
-﻿h1 {
+﻿h1,h3 {
     text-align: center;
 }
 
@@ -62,5 +62,10 @@ img{
     width:270px;
 }
 
-
+#complete, #wating {
+    margin-top: 200px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
 
