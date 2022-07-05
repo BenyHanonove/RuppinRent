@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" hrel="../style/indexStyle.css" />
+    <link rel="stylesheet" href="../style/style1.css" />
+    <link href="../style/cssgrids.css" rel="stylesheet" />
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+
+    <script>
+
+        $(document).ready(function () {
+            localStorage.removeItem("house");
+            $("#signIn").click(signInHerf);
+            $("#signUp").click(signUpHerf);
+            $("#logoPic").click(indexHerf);
+            activeUser();
+            loadUsers();
+        });
+
+        function loadHouses() {
+            let api = "../api/Houses";
+            ajaxCall("GET", api, "", getHousesSuccessCB, getHousesErrorCB);
+        }
+
+
+        function activeUser() {
+
+            if (localStorage.getItem("user") != null) {
+                let active = JSON.parse(localStorage.getItem("user"));
+                let str = "<p>Hello <br>";
+                str += active.Username;
+                str += "</p>";
+                str += '<button id="logOut">LOG OUT</button>';
+                str += '<button id="orderBtn">MY ORDERS</button>';
+                $("#sign").html(str);
+                $("#orderBtn").click(myOrdersHerf);
+                $("#logOut").click(logOut);
+            }
+            else {
+
+                let str = "<p>Hello Guest<br>";
+                str += "</p>";
+                str += '<button id="signIn">sign in</button>';
+                str += '<button id="signUp">sign up</button>';
+                $("#sign").html(str);
+                $("#signIn").click(signInHerf);
+                $("#signUp").click(signUpHerf);
+
+            }
+
+        }
+        function logOut() {
+            localStorage.clear();
+            indexHerf();
+        }
+
+
+        function signInHerf() {
+            localStorage.clear();
+            window.location.href = 'signIn.html';
+        }
+
+        function signUpHerf() {
+            localStorage.clear();
+            window.location.href = 'signUp.html';
+        }
+
+        function indexHerf() {
+            window.location.href = 'index.html';
+        }
+
+        function myOrdersHerf() {
+            window.location.href = 'myOrders.html';
+        }
+
+        function dropDown() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+        function zoom(direction) {
+            var filterID = event.target.value;
+            console.log(filterID, direction);
+            var slider = $("#" + filterID);
+            var step = parseInt(slider.attr('step'), 10);
+            var currentSliderValue = parseInt(slider.val(), 10);
+            console.log(step)
+            var newStepValue = currentSliderValue + step;
+
+            if (direction === "out") {
+                newStepValue = currentSliderValue - step;
+            } else {
+                newStepValue = currentSliderValue + step;
+            }
+
+            slider.val(newStepValue).change();
+        };
+
+        function loadUsers() {
+            let api = "../api/Users";
+            ajaxCall("GET", api, "", getUsersSuccessCB, getUsersErrorCB);
+        }
+
+        function getUsersSuccessCB(users) {
+
+            let str = "<table><tr><th>Email</th><th>Username</th><th>Password</th>" +
+                "<th>Join Date</th><th>Rent count</th><th>Cancel count</th>" +
+                "<th>id</th></tr> ";
+
+            for (let i = 0; i < users.length; i++) {
+                str += "<tr>";
+                str += "<th> Email</th >";
+                str += "<th>Username</th>";
+                str += "<th>Password</th>";
+                str += "<th>Join Date</th>";
+                str += "<th>Rent count</th>";
+                str += "<th>Cancel count</th>";
+                str += "<th>id</th>";
+                str += "</tr>";
+            }
+
+            str += "</table>";
+            $(".container").html(str);
+
+        }
+
+        function getUsersErrorCB(err) {
+            console.log(err);
+        }
+
+    </script>
+
+</head>
+<body>
+
+
+    <div id="logo">
+
+        <div id="sign">
+            <button id="signIn">sign in</button>
+            <button id="signUp">sign up</button>
+        </div>
+
+        <img id="logoPic" class="center" style="width: 600px; height: 400px;" src="../ruppinLogo/logo.png" />
+        <!--<img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />-->
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    </div>
+
+
+    <div id="big">
+        <h1>Users Table</h1>
+    </div>
+
+    <div class="container">
+    </div>
+
+
+
+</body>
+</html>

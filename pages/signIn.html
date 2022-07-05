@@ -5,21 +5,23 @@
     <meta charset="utf-8" />
     <title></title>
     <link rel="stylesheet" href="../style/style1.css" />
-
-
+    <link href="../style/cssgrids.css" rel="stylesheet" />
     <script src="../Scripts/ajaxCalls.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-            crossorigin="anonymous"></script>
+            crossorigin="anonymous">
+    </script>
 
     <script>
 
         $(document).ready(function () {
             $("#signUp").click(signUpHerf);
             $("#logoPic").click(indexHerf);
-            $("#btn").click(LogIn);
+            $("#enter").click(LogIn);
         });
 
         function signUpHerf() {
@@ -83,24 +85,32 @@
     <div id="logo">
 
         <div id="sign">
-            <button id="signUp">sign up</button>
+            <button id="btn">sign up</button>
         </div>
 
-        <img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />
+        <img id="logoPic" class="center" style="width: 600px; height: 400px;" src="../ruppinLogo/logo.png" />
         <h1>Ruppin Rent</h1>
     </div>
 
-    <div id="input">
-        <h1>SIGN IN</h1>
-        <h2>Email:</h2>>
-        <input id="emailBox" type="text" />
-        <br>
-        <h2>Password:</h2>>
-        <input id="passwordBox" type="text" />
-        <br>
-        <button id="btn">Enter</button>
-    </div>
 
+
+    <div class="container" style="padding-top:140px;">
+        <div class="card">
+            <div class="box">
+                <div class="content" id="input" style="margin-top:0px;">
+                    <h3>Sign In :</h3>
+                    <br />
+                    <h4 style="color:white;">Email:</h4>
+                    <input id="emailBox" type="text" />
+                    <br>
+                    <h4 style="color:white;">Password:</h4>
+                    <input id="passwordBox" type="text" />
+
+                    <a href="#" id="enter">enter</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

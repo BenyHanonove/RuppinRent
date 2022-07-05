@@ -7,15 +7,16 @@
     <link rel="stylesheet" href="../style/style1.css" />
     <link href="../style/cssgrids.css" rel="stylesheet" />
     <script src="../Scripts/ajaxCalls.js"></script>
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
             crossorigin="anonymous">
     </script>
 
- 
+
     <script>
 
+        //the script that runs in the start of the html page
         $(document).ready(function () {
             localStorage.removeItem("house");
             $("#signIn").click(signInHerf);
@@ -23,15 +24,16 @@
             $("#logoPic").click(indexHerf);
             activeUser();
             loadHouses();
-            filterFunction();
         });
 
+        //funtion load the houses from the server
         function loadHouses() {
             let api = "../api/Houses";
             ajaxCall("GET", api, "", getHousesSuccessCB, getHousesErrorCB);
         }
 
-        function getHousesSuccessCB(houses){
+        //funtion get 
+        function getHousesSuccessCB(houses) {
 
             let str1 = "<p><h1>Top rated houses :</h1></p>";
             let str = "";
@@ -39,7 +41,7 @@
             let values = [];
             let alreadyIn = false;
 
-            while (counter <= 6) {
+            while (counter < 6) {
                 let i = Math.floor(Math.random() * 100);
                 alreadyIn = false;
 
@@ -51,8 +53,8 @@
 
                 if (houses[i].Score > 4.7 && alreadyIn == false) {
                     values[counter] = i;
-                    
-                  
+
+
                     str += "<div class='card'>";
                     str += "<div class='box'>";
                     str += "<div class='content'>";
@@ -84,7 +86,7 @@
         }
 
         function activeUser() {
- 
+
             if (localStorage.getItem("user") != null) {
                 let active = JSON.parse(localStorage.getItem("user"));
                 let str = "<p>Hello <br>";
@@ -119,13 +121,12 @@
         }
 
         function getHouseNameSuccessCB(houses) {
-            console.log(houses);
             let str = "<h1> Results : </h1>";
             let counter = 0;
 
             for (var i = 0; i < houses.length; i++) {
 
-              
+
                 str += "<div class='card'>";
                 str += "<div class='box'>";
                 str += "<div class='content'>";
@@ -137,7 +138,7 @@
                 str += "</div>";
                 str += "</div>";
 
-              
+
                 counter++;
             }
 
@@ -176,32 +177,6 @@
             document.getElementById("myDropdown").classList.toggle("show");
         }
 
-        function filterFunction() {
-
-            $("#roomsRangeMinus, #minus, #scoreRangeMinus, #priceRangeMinus").click(function (event) {
-                zoom("out");
-            });
-
-            $("#roomsRangePlus, #plus, #scoreRangePlus, #priceRangePlus").click(function (event) {
-                zoom("in");
-            });
-
-            $("#range").on('input change', function (event) {
-                $('#output').text($(event.currentTarget).val());
-            });
-
-            $("#roomsRange").on('input change', function (event) {
-                $('#roomsRangeOutput').text($(event.currentTarget).val());
-            });
-
-            $("#priceRange").on('input change', function (event) {
-                $('#priceRangeOutput').text($(event.currentTarget).val());
-            });
-
-            $("#scoreRange").on('input change', function (event) {
-                $('#scoreRangeOutput').text($(event.currentTarget).val());
-            });
-
             function zoom(direction) {
                 var filterID = event.target.value;
                 console.log(filterID, direction);
@@ -219,13 +194,6 @@
 
                 slider.val(newStepValue).change();
             };
-
-        }
-
-
-        function updateFilters() {
-            console.log("hi")
-        }
 
 
     </script>
@@ -248,61 +216,14 @@
 
         <img id="logoPic" class="center" style="width: 600px; height: 400px;" src="../ruppinLogo/logo.png" />
         <!--<img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />-->
-        <h1>Ruppin Rent</h1>
 
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-        <!--<input class="style" type="text" id="search" placeholder="Search.." name="search">
-    <button class="style" onclick="searchByName()"><i class="fa fa-search"></i></button>-->
+
 
 
     </div>
-        <!--<form action="" class="search-bar">
-            <input type="search" name="search" pattern=".*\S.*" required>
-            <button class="search-btn" type="submit">
-                <span>Search</span>
-            </button>
-        </form>-->
 
-        <!--<div class="dropdown">
-            <button onclick="dropDown()" class="dropbtn">Filter</button>
-            <div id="myDropdown" class="dropdown-content">
-                <div class="container" id="apply">
-                    <button class="style" onclick="updateFilters()">Apply<i class="fa fa-edit"></i></button>
-                </div>
-                <div class="container" id="distance">
-                    Distance:
-                    <button value="range" id="minus">-</button>
-                    <input id="range" type="range" step="10" value="50">
-                    <button value="range" id="plus">+</button>
-                    <output for="range" id="output">50</output>
-                </div>
-                <div class="container" id="scoree">
-                    Score:
-                    <button value="scoreRange" id="scoreRangeMinus">-</button>
-                    <input id="scoreRange" type="range" step="10" value="50">
-                    <button value="scoreRange" id="scoreRangePlus">+</button>
-                    <output for="range" id="scoreRangeOutput">50</output>
-                </div>
-                <div class="container" id="roomsRangee">
-                    Rooms:
-                    <button value="roomsRange" id="roomsRangeMinus">-</button>
-                    <input id="roomsRange" type="range" step="5" value="50">
-                    <button value="roomsRange" id="roomsRangePlus">+</button>
-                    <output for="range" id="roomsRangeOutput">50</output>
-                </div>
-                <div class="container" id="pricee">
-                    Price:
-                    <button value="priceRange" id="priceRangeMinus">-</button>
-                    <input id="priceRange" type="range" step="10" value="50">
-                    <button value="priceRange" id="priceRangePlus">+</button>
-                    <output for="range" id="priceRangeOutput">50</output>
-                </div>-->
-
-            <!--</div>
-        </div>
-
-    </div>-->
 
     <div id="big">
 
@@ -310,38 +231,7 @@
 
     <div class="container">
 
-        <!--<div class="card">
-            <div class="box">
-                <div class="content">
-                    <h2>01</h2>
-                    <h3>Card One</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore, totam velit? Iure nemo labore inventore?</p>
-                    <a href="#">Read More</a>
-                </div>
-            </div>
-        </div>
 
-        <div class="card">
-            <div class="box">
-                <div class="content">
-                    <h2>02</h2>
-                    <h3>Card Two</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore, totam velit? Iure nemo labore inventore?</p>
-                    <a href="#">Read More</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="box">
-                <div class="content">
-                    <h2>03</h2>
-                    <h3>Card Three</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore, totam velit? Iure nemo labore inventore?</p>
-                    <a href="#">Read More</a>
-                </div>
-            </div>
-        </div>-->
     </div>
 </body>
 </html>

@@ -22,45 +22,42 @@
 }
 
 #input {
-    margin-top:180px;
-    text-align:center;
+    margin-top: 180px;
+    text-align: center;
     width: 100%;
 }
 
 .tiny {
     margin-left: auto;
     margin-right: auto;
-    display:block;
+    display: block;
     height: 100px;
     width: 80px;
-    border:solid 1px grey;
+    border: solid 1px grey;
 }
 
-#big{
-    margin-top:200px;
-    width:100%;
+#big {
+    margin-top: 200px;
+    width: 100%;
 }
 
-#left{
-    width:30%;
-    float:left;
+#left {
+    width: 30%;
+    float: left;
 }
 
-#right{
-    width:69%;
-    float:left;
+#right {
+    width: 69%;
+    float: left;
 }
 
-.small{
-    width:200px;
-    height:200px;
-    float:left;
+.small {
+    width: 200px;
+    height: 200px;
+    float: left;
 }
 
-img{
-    height:370px;
-    width:270px;
+img {
+    height: 370px;
+    width: 270px;
 }
-
-
-

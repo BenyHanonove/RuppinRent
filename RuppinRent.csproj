@@ -179,6 +179,7 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="pages\adminPage.html" />
     <Content Include="pages\houseInfo.html" />
     <Content Include="pages\index.html" />
     <Content Include="pages\myOrders.html" />
@@ -213,8 +214,10 @@
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
-    <Content Include="style\style1.css" />
+    <Content Include="style\cssgrids.css" />
     <Content Include="style\indexStyle.css" />
+    <Content Include="style\searchstyle.css" />
+    <Content Include="style\style1.css" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
