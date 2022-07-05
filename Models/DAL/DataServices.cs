@@ -308,6 +308,20 @@ namespace RuppinRent.Models.DAL
             return numAffected;
         }
 
+        public int CancelUpdateMinus(User u)
+        {
+            SqlConnection con = Connect();
+
+            string commStr = "UPDATE Users SET cancelTotal = cancelTotal + 1 where id =" + u.Id;
+
+            SqlCommand command = CreateCommand(commStr, con);
+            // Execute
+            int numAffected = command.ExecuteNonQuery();
+
+            con.Close();
+
+            return numAffected;
+        }
 
     }
 }

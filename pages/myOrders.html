@@ -119,8 +119,7 @@
         }
 
         function deleteOrderSuccessCB() {
-            alert("Order has removed");
-            indexHerf();
+            updateDeleteCounter();
         }
 
         function deleteOrderErrorCB(err) {
@@ -145,6 +144,31 @@
             }
             else {
                 return false;
+            }
+        }
+
+        function updateDeleteCounter() {
+            let user = JSON.parse(localStorage.getItem("user"));
+
+            let userData = {
+                email: user.Email,
+                password: user.Password,
+                username: user.Username,
+                joinDate: user.JoinDate,
+                rentTotal: user.RentTotal,
+                cancelTotal: user.CancelTotal,
+                id: user.Id
+            }
+            let api = "../api/Users/Cancel";
+            ajaxCall("PUT", api, JSON.stringify(userData), updateCounterSuccessCB, updateCounterErrorCB);
+
+            function updateCounterSuccessCB() {
+                alert("order has been removed");
+                indexHerf();
+            }
+
+            function updateCounterErrorCB(err) {
+                console.log(err);
             }
         }
 

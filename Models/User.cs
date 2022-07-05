@@ -79,5 +79,12 @@ namespace RuppinRent.Models
             ds.RentUpdatePlus(u);
             return 1;
         }
+
+        public int UpdateCancelMinus(User u)
+        {
+            DataServices ds = new DataServices();
+            ds.CancelUpdateMinus(u);
+            return 1;
+        }
     }
 }

@@ -278,7 +278,6 @@
                 cancelTotal: user.CancelTotal,
                 id: user.Id
             }
-            console.log(data)
             let api = "../api/Users/data";
             ajaxCall("PUT", api, JSON.stringify(data), updateCounterSuccessCB, updateCounterErrorCB);
         }

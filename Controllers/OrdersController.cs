@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using RuppinRent.Models;
+using HttpPutAttribute = System.Web.Http.HttpPutAttribute;
+using RouteAttribute = System.Web.Http.RouteAttribute;
 
 
 namespace RuppinRent.Controllers
@@ -37,8 +39,12 @@ namespace RuppinRent.Controllers
         }
 
         // PUT api/<controller>/5
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        [Route("api/Users/Cancel")]
+        public int put(User u)
         {
+            // User user = new User();
+            return u.UpdateCancelMinus(u);
         }
 
 
