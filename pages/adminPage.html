@@ -92,6 +92,23 @@
             document.getElementById("myDropdown").classList.toggle("show");
         }
 
+        function zoom(direction) {
+            var filterID = event.target.value;
+            console.log(filterID, direction);
+            var slider = $("#" + filterID);
+            var step = parseInt(slider.attr('step'), 10);
+            var currentSliderValue = parseInt(slider.val(), 10);
+            console.log(step)
+            var newStepValue = currentSliderValue + step;
+
+            if (direction === "out") {
+                newStepValue = currentSliderValue - step;
+            } else {
+                newStepValue = currentSliderValue + step;
+            }
+
+            slider.val(newStepValue).change();
+        };
 
         function loadUsers() {
             let api = "../api/Users";
@@ -106,13 +123,13 @@
             for (k in users) {
                 if (check) {
                     str += "<tr class='active-row'>";
-                    str += "<th> Email</th >";
-                    str += "<th>Username</th>";
-                    str += "<th>Password</th>";
-                    str += "<th>Join Date</th>";
-                    str += "<th>Rent count</th>";
-                    str += "<th>Cancel count</th>";
-                    str += "<th>id</th>";
+                str += "<th> Email</th >";
+                str += "<th>Username</th>";
+                str += "<th>Password</th>";
+                str += "<th>Join Date</th>";
+                str += "<th>Rent count</th>";
+                str += "<th>Cancel count</th>";
+                str += "<th>id</th>";
                     str += "<th>totalIncome</th>";
                     str += "</tr>";
                     check = false;

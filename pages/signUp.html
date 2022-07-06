@@ -10,8 +10,7 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-            crossorigin="anonymous">
-    </script>
+            crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
@@ -26,18 +25,18 @@
 
         function signInHerf() {
             window.location.href = 'signIn.html';
-        }
+            }
 
 
         function indexHerf() {
             window.location.href = 'index.html';
-        }
+            }
 
         function BuildUser() {
             let email = document.getElementById('emailBox');
-            let password = document.getElementById('passwordBox');
-            let username = document.getElementById('usernameBox');
-            let currentDate = new Date();
+        let password = document.getElementById('passwordBox');
+        let username = document.getElementById('usernameBox');
+        let currentDate = new Date();
 
             if (ValidateEmail(email)) {
                 if (password_validation(password, 6, 12)) {
