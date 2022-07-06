@@ -19,6 +19,7 @@
         let maxDays;
         let minDays;
         let HouseOrders;
+        
 
         $(document).ready(function () {
             $("#signIn").click(signInHerf);
@@ -192,6 +193,7 @@
             let email = JSON.parse(localStorage.getItem("user")).Email;
             let OrderFor = $("#order4").val();
             let OrderEnd = $("#order4end").val()
+            
 
             let currentDate = new Date();
             let start = dateTransfer(OrderFor);
@@ -217,6 +219,7 @@
                 }
             }
 
+            let totalPrice = Number(houseData.Price.replace(/^\D|,+/g, '')) * dateDiff;
             //check if the days the user put are vaild 
             // and can be orderd
             if (dateCheck == false) {
@@ -229,8 +232,10 @@
                                     houseId: houseData.Id,
                                     orderdIn: currentDate,
                                     orderdFor: OrderFor,
-                                    orderdOut: OrderEnd
+                                    orderdOut: OrderEnd,
+                                    price: totalPrice
                                 };
+                                console.log(totalPrice)
                                 addOrder(orderData);
                             }
                             else {
@@ -261,13 +266,14 @@
         }
 
 
-        function addOrderSuccessCB(status) {
+        function addOrderSuccessCB(housePrice) {
             alert("your order has been added");
-            updateCounter();
+            updateCounter(housePrice);
         }
 
-        function updateCounter() {
+        function updateCounter(housePrice) {
             let user = JSON.parse(localStorage.getItem("user"));
+            let newPrice = parseInt(user.TotalIncome) + parseInt(housePrice)
 
             let data = {
                 email: user.Email,
@@ -276,7 +282,8 @@
                 joinDate: user.JoinDate,
                 rentTotal: user.RentTotal ,
                 cancelTotal: user.CancelTotal,
-                id: user.Id
+                id: user.Id,
+                totalIncome: newPrice
             }
             let api = "../api/Users/data";
             ajaxCall("PUT", api, JSON.stringify(data), updateCounterSuccessCB, updateCounterErrorCB);

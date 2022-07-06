@@ -14,6 +14,13 @@ namespace RuppinRent.Controllers
     public class OrdersController : ApiController
     {
 
+        public IEnumerable<Order> Get()
+        {
+            Order o = new Order();
+            List<Order> orders = o.GetAllOrders();
+            return orders;
+        }
+
         public IEnumerable<Order> Get(string Email)
         {
             Order o = new Order();
@@ -23,19 +30,19 @@ namespace RuppinRent.Controllers
 
 
 
-        public IEnumerable<Order> Get(long id)
+        public IEnumerable<Order> Get(long Id)
         {
             Order o = new Order();
-            List<Order> orders = o.GetOrders(id);
+            List<Order> orders = o.GetOrders(Id);
             return orders;
         }
 
 
         // POST api/<controller>
-        public int Post([FromBody] Order order)
+        public string Post([FromBody] Order order)
         {
             order.InserOrder();
-            return 1;
+            return order.Price;
         }
 
         // PUT api/<controller>/5
@@ -49,11 +56,12 @@ namespace RuppinRent.Controllers
 
 
         // DELETE api/<controller>/5
-        [System.Web.Http.Route("api/Houses/{Email}/{Id}")]
-        public void Delete(string Email,long Id)
+        [System.Web.Http.HttpDelete]
+        [Route("api/Orders/delete")]
+        public int Delete(Order order)
         {
-            Order order = new Order();
-            order.DeleteOrder(Email,Id);
+            order.DeleteOrder(order);
+            return 1;
         }
     }
 }

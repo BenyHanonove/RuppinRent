@@ -19,8 +19,10 @@ namespace RuppinRent.Controllers
             return review;
         }
 
-        public void Post(int id)
+        public int Post([FromBody] Review review)
         {
+            review.InserReview();
+            return 1;
         }
 
         // PUT api/<controller>/5

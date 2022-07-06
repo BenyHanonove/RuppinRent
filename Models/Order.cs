@@ -14,6 +14,7 @@ namespace RuppinRent.Models
         DateTime orderdFor;
         int id; 
         DateTime orderdOut;
+        string price;
 
         public Order() { }
 
@@ -27,14 +28,15 @@ namespace RuppinRent.Models
             this.orderdOut = OrderOut;
         }
 
-        public Order(string Email, long HouseId,DateTime OrderdIn, DateTime OrderFor , int Id ,DateTime OrderOut)
+        public Order(string Email, long HouseId, DateTime OrderdIn, DateTime OrderFor, int Id, DateTime OrderOut, string price)
         {
             this.email = Email;
             this.houseId = HouseId;
             this.orderdIn = OrderdIn;
             this.orderdFor = OrderFor;
             this.id = Id;
-            this.orderdOut= OrderOut;
+            this.orderdOut = OrderOut;
+            this.price = price;
         }
 
 
@@ -44,6 +46,7 @@ namespace RuppinRent.Models
         public DateTime OrderdFor { get => orderdFor; set => orderdFor = value; }
         public int Id { get => id; set => id = value; }
         public DateTime OrderdOut { get => orderdOut; set => orderdOut = value; }
+        public string Price { get => price; set => price = value; }
 
 
         public string StringDateIn()
@@ -87,6 +90,13 @@ namespace RuppinRent.Models
             return orders;
         }
 
+        public List<Order> GetAllOrders()
+        {
+            DataServices ds = new DataServices();
+            List<Order> orders = ds.GetAllOrders();
+            return orders;
+        }
+
         public List<Order> GetOrders(long Id)
         {
             DataServices ds = new DataServices();
@@ -94,10 +104,10 @@ namespace RuppinRent.Models
             return orders;
         }
 
-        public int DeleteOrder(string e , long id)
+        public int DeleteOrder(Order order)
         {
-            DataServices ds =new DataServices();
-            ds.DeleteOrder(e, id);
+            DataServices ds = new DataServices();
+            ds.DeleteOrder(order);
             return 1;
         }
 

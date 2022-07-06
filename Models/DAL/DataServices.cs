@@ -13,6 +13,8 @@ namespace RuppinRent.Models.DAL
     {
         public DataServices() { }
 
+        public SqlDataAdapter da;
+        public DataTable dt;
         public int InsertUser(User u)
         {
             SqlConnection con = Connect();
@@ -23,8 +25,8 @@ namespace RuppinRent.Models.DAL
             //"('"+u.Email+"','"+u.Password+"','"+u.Username+"'); ";
 
             // use a string builder to create the dynamic string
-            sb.AppendFormat("Values('{0}', '{1}','{2}','{3}','{4}','{5}')", u.Email, u.Password, u.Username,u.StringDateJoin(),u.RentTotal,u.CancelTotal);
-            String prefix = "INSERT INTO Users " + "([email],[password], [username],[joinDate],[rentTotal],[cancelTotal])";
+            sb.AppendFormat("Values('{0}', '{1}','{2}','{3}','{4}','{5}', '{6}')", u.Email, u.Password, u.Username,u.StringDateJoin(),u.RentTotal,u.CancelTotal, u.TotalIncome);
+            String prefix = "INSERT INTO Users " + "([email],[password], [username],[joinDate],[rentTotal],[cancelTotal], [totalIncome])";
 
             string cStr = prefix + sb.ToString();
 
@@ -55,11 +57,39 @@ namespace RuppinRent.Models.DAL
                 int rentTotal = int.Parse(dr["rentTotal"].ToString());
                 int cancelTotal =int.Parse(dr["cancelTotal"].ToString());
                 int id = int.Parse(dr["id"].ToString());
-                users.Add(new User(email, password, username,joindate,rentTotal,cancelTotal,id));
+                int totalIncome = int.Parse(dr["totalIncome"].ToString());
+                users.Add(new User(email, password, username,joindate,rentTotal,cancelTotal,id,totalIncome));
             }
 
             return users;
         }
+
+        public List<Owner> GetOwners()
+        {
+            SqlConnection con = Connect();
+            //string commandStr = "select MIN(host_id) AS host_id ,host_name,host_since From Houses GROUP BY host_id";
+            string commandStr = "select Houses.id, Houses.host_id,Houses.host_name,Houses.host_since, Orders.totalPrice From Houses INNER JOIN Orders on Houses.id = Orders.houseId ";
+                
+            SqlCommand command = new SqlCommand(commandStr, con);
+            SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);
+            //לקחת את הטבלה של הבתים לקחת את הטבלה של ההזמנות - אם האיידי של הבית קיים בשתי הטבלאות
+            //צריך למשוך את האונר של הבית  ולהוסיף לאונר שמשכנו אם הבית שלו היה קיים בהזמנות 
+            //את הטוטאל פרייס
+            List<Owner> owners = new List<Owner>();
+
+            while (dr.Read())
+            {
+
+                int hostId = int.Parse(dr["host_id"].ToString());
+                string hostName = dr["host_name"].ToString() ;
+                DateTime hostSince = Convert.ToDateTime(dr["host_since"]);
+                int totalPrice = int.Parse(dr["totalPrice"].ToString());
+                owners.Add(new Owner(hostId, hostName, hostSince,totalPrice));
+            }
+
+            return owners;
+        }
+
 
         public List<House> GetHouses()
         {
@@ -83,46 +113,21 @@ namespace RuppinRent.Models.DAL
                 char SuperHost = dr["host_is_superhost"].ToString()[0];
                 int MinimumNights = Convert.ToInt32(dr["minimum_nights"]);
                 int Maximum_nights = Convert.ToInt32(dr["maximum_nights"]);
+                int Beds = Convert.ToInt32(dr["beds"]);
+                float Latitude = float.Parse(dr["latitude"].ToString());
+                float Longitude = float.Parse(dr["longitude"].ToString());
+
+
                 houses.Add(new House(Id, Name, Description, Picture, Neighbourhoood,
-                    NeighbourhooodOverview, Score,Price,SuperHost,MinimumNights,Maximum_nights));
+                    NeighbourhooodOverview, Score,Price,SuperHost,MinimumNights,Maximum_nights ,
+                    Beds , Latitude , Longitude));
             }
 
             return houses;
 
         }
 
-        public List<House> GetHousesByName(string name)
-        {
-            SqlConnection con = Connect();
-            string commandStr = "SELECT *"
-                                    + " FROM Houses as h"                       
-                                    + " WHERE h.name LIKE " + "'%" + name + "%';";
-            SqlCommand command = CreateCommand(commandStr, con);
-            SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);
-
-            List<House> houses = new List<House>();
-
-            while (dr.Read())
-            {
-                long Id = Convert.ToInt64(dr["id"]);
-                string Name = dr["name"].ToString();
-                string Description = dr["description"].ToString();
-                string Picture = dr["picture_url"].ToString();
-                string Neighbourhoood = dr["neighbourhood"].ToString();
-                string NeighbourhooodOverview = dr["neighborhood_overview"].ToString();
-                float Score = float.Parse(dr["review_scores_rating"].ToString());
-                string Price = dr["price"].ToString();
-                char SuperHost = dr["host_is_superhost"].ToString()[0];
-                int MinimumNights = Convert.ToInt32(dr["minimum_nights"]);
-                int Maximum_nights = Convert.ToInt32(dr["maximum_nights"]);
-
-                houses.Add(new House(Id, Name, Description, Picture, Neighbourhoood,
-                    NeighbourhooodOverview, Score, Price, SuperHost, MinimumNights, Maximum_nights));
-            }
-
-            return houses;
-
-        }
+   
 
         public House GetHouse(long id)
         {
@@ -146,9 +151,13 @@ namespace RuppinRent.Models.DAL
                 char SuperHost = dr["host_is_superhost"].ToString()[0];
                 int MinimumNights = Convert.ToInt32(dr["minimum_nights"]);
                 int Maximum_nights = Convert.ToInt32(dr["maximum_nights"]);
+                int Beds = Convert.ToInt32(dr["beds"].ToString());
+                float Latitude = float.Parse(dr["latitude"].ToString());
+                float Longitude = float.Parse(dr["longitude"].ToString());
 
                 house = new House(Id, Name, Description, Picture, Neighbourhoood,
-                    NeighbourhooodOverview, Score, Price, SuperHost, MinimumNights, Maximum_nights);
+                    NeighbourhooodOverview, Score, Price, SuperHost, MinimumNights, Maximum_nights,
+                    Beds, Latitude, Longitude);
             }
 
             return house;
@@ -216,8 +225,8 @@ namespace RuppinRent.Models.DAL
         {
             SqlConnection con = Connect();
 
-            string commStr = "INSERT INTO Orders (houseId,email,orderdIn,orderFor,orderdOut)" +
-            "values("+o.HouseId+",'"+o.Email+"', '"+o.StringDateIn()+"', '"+o.StringDateFor()+"','"+ o.StringDateOut()+"')"; 
+            string commStr = "INSERT INTO Orders (houseId,email,orderdIn,orderFor,orderdOut,totalPrice)" +
+            "values("+o.HouseId+",'"+o.Email+"', '"+o.StringDateIn()+"', '"+o.StringDateFor()+"','"+ o.StringDateOut()+ "','" + o.Price + "')"; 
 
             SqlCommand command = CreateCommand(commStr, con);
             // Execute
@@ -246,7 +255,35 @@ namespace RuppinRent.Models.DAL
                 DateTime orderFor = Convert.ToDateTime(dr["orderFor"]);
                 int id = Convert.ToInt32(dr["id"]);
                 DateTime orderdOut = Convert.ToDateTime(dr["orderdOut"]);
-                orders.Add(new Order(email, houseId, orderedIn,orderFor,id,orderdOut));
+                string price = dr["totalPrice"].ToString();
+
+                orders.Add(new Order(email, houseId, orderedIn,orderFor,id,orderdOut, price));
+            }
+
+            return orders;
+        }
+
+
+        public List<Order> GetAllOrders()
+        {
+            SqlConnection con = Connect();
+            string commandStr = "select * from Orders";
+            SqlCommand command = new SqlCommand(commandStr, con);
+            SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);
+
+            List<Order> orders = new List<Order>();
+
+            while (dr.Read())
+            {
+                string email = dr["email"].ToString();
+                long houseId = Convert.ToInt64(dr["houseId"]);
+                DateTime orderedIn = Convert.ToDateTime(dr["orderdIn"]);
+                DateTime orderFor = Convert.ToDateTime(dr["orderFor"]);
+                int id = Convert.ToInt32(dr["id"]);
+                DateTime orderdOut = Convert.ToDateTime(dr["orderdOut"]);
+                string price = dr["totalPrice"].ToString();
+
+                orders.Add(new Order(email, houseId, orderedIn, orderFor, id, orderdOut, price));
             }
 
             return orders;
@@ -270,18 +307,20 @@ namespace RuppinRent.Models.DAL
                 DateTime orderFor = Convert.ToDateTime(dr["orderFor"]);
                 int id = Convert.ToInt32(dr["id"]);
                 DateTime orderdOut = Convert.ToDateTime(dr["orderdOut"]);
-                orders.Add(new Order(email, houseId, orderedIn, orderFor, id, orderdOut));
+                string price = dr["totalPrice"].ToString();
+
+                orders.Add(new Order(email, houseId, orderedIn, orderFor, id, orderdOut, price));
             }
 
             return orders;
         }
 
 
-        public int DeleteOrder(string email,long id)
+        public int DeleteOrder(Order order)
         {
             SqlConnection con = Connect();
 
-            string commStr = "delete from Orders where houseId =" +id +" and email = '"+email+"'";
+            string commStr = "delete from Orders where id=" + order.Id;
 
             SqlCommand command = CreateCommand(commStr, con);
             // Execute
@@ -297,7 +336,8 @@ namespace RuppinRent.Models.DAL
         {
             SqlConnection con = Connect();
 
-            string commStr = "UPDATE Users SET rentTotal = RentTotal + 1 where id =" + u.Id;
+            string commStr = "UPDATE Users SET rentTotal = RentTotal + 1, totalIncome = " + u.TotalIncome +
+                "where id =" + u.Id;
 
             SqlCommand command = CreateCommand(commStr, con);
             // Execute
@@ -323,5 +363,42 @@ namespace RuppinRent.Models.DAL
             return numAffected;
         }
 
+        public int InsertReview(Review r)
+        {
+            SqlConnection con = Connect();
+
+            string commStr = "INSERT INTO Reviews (listing_id , id , date ,reviewer_id , reviewer_name , comments )" +
+                "values(" + r.ListingId + ",666,'" + r.NowDateTime() + "'," + r.ReviewerId + ",'" + r.ReviewerName + "','" + r.Comments + "')";
+
+            SqlCommand command = CreateCommand(commStr, con);
+            // Execute
+            int numAffected = command.ExecuteNonQuery();
+
+            con.Close();
+
+            return numAffected;
+        }
+
+
+
+        public int DeleteUser(int id)
+        {
+            SqlConnection con = Connect();
+
+            string commStr = "delete from Users where id =" + id + "";
+
+            SqlCommand command = CreateCommand(commStr, con);
+            // Execute
+            int numAffected = command.ExecuteNonQuery();
+
+            con.Close();
+
+            return numAffected;
+        }
+
+
+
     }
+
+
 }

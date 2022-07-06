@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using RuppinRent.Models;
+using HttpDeleteAttribute = System.Web.Http.HttpDeleteAttribute;
 using HttpPutAttribute = System.Web.Http.HttpPutAttribute;
 using RouteAttribute = System.Web.Http.RouteAttribute;
 
@@ -39,8 +40,10 @@ namespace RuppinRent.Controllers
 
 
         // DELETE api/<controller>/5
-        public void Delete(int id)
+        public int Delete(int id)
         {
+            User user = new User();
+           return user.DeleteUser(id);
         }
 
     }

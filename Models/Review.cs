@@ -35,11 +35,38 @@ namespace RuppinRent.Models
         public string ReviewerName { get => reviewerName; set => reviewerName = value; }
         public string Comments { get => commemts; set => commemts = value; }
 
+
+
+        public string NowDateTime()
+        {
+            DateTime now = DateTime.Now;
+            string str = now.Day + "/" + now.Month + "/" + now.Year;
+            return str;
+        }
+
+        public string SplitEmail()
+        {
+            String[] spearator = { "s, ", "For" };
+            Int32 count = 2;
+
+            // using the method
+            String[] strlist = this.reviewerName.Split(spearator, count, StringSplitOptions.RemoveEmptyEntries);
+
+            return strlist[0];
+        }
+
         public List<Review> GetReviews(float id)
         {
             DataServices ds = new DataServices();
             List <Review> reviews = ds.GetReviews(id);
             return reviews;
+        }
+
+        public int InserReview()
+        {
+            DataServices ds = new DataServices();
+            ds.InsertReview(this);
+            return 1;
         }
 
 

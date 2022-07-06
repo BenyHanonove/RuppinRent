@@ -4,7 +4,9 @@
     <meta charset="utf-8" />
     <title></title>
 
+    <link rel="stylesheet" hrel="../style/indexStyle.css" />
     <link rel="stylesheet" href="../style/style1.css" />
+    <link href="../style/cssgrids.css" rel="stylesheet" />
 
     <script src="../Scripts/ajaxCalls.js"></script>
 
@@ -29,14 +31,14 @@
         function activeUser() {
 
             if (localStorage.getItem('user') != null) {
-                 let active = JSON.parse(localStorage.getItem("user"));
-                 let str = "<p>Hello <br>";
-                 str += active.Username;
-                 str += "</p>";
-                 str += '<button id="logOut">LOG OUT</button>'
-                 $("#sign").html(str);
-                 $("#logOut").click(logOut);
-             }
+                let active = JSON.parse(localStorage.getItem("user"));
+                let str = "<p>Hello <br>";
+                str += active.Username;
+                str += "</p>";
+                str += '<button id="logOut">LOG OUT</button>'
+                $("#sign").html(str);
+                $("#logOut").click(logOut);
+            }
         }
 
         function logOut() {
@@ -63,7 +65,7 @@
         function loadOrders() {
             let user = JSON.parse(localStorage.getItem("user"));
             let api = "../api/Orders?Email=" + user.Email;
-            ajaxCall("GET", api,"",getOrdersSuccessCB ,getOrdersErrorCB);
+            ajaxCall("GET", api, "", getOrdersSuccessCB, getOrdersErrorCB);
         }
 
         function getOrdersErrorCB(err) {
@@ -71,6 +73,9 @@
         }
 
         function getOrdersSuccessCB(ordersData) {
+
+            let str1 = "<p><h1>My Orders :</h1></p>";
+            $("#big").html(str1);
 
             orders = ordersData;
             for (let i = 0; i < orders.length; i++) {
@@ -90,32 +95,58 @@
         }
 
         function buildPage(house, order) {
+
+            let orderEnd = order.OrderdOut;
+            let datesTillDone = dayGap(orderEnd);
             let orderDate = order.OrderdFor;
-            let btnCheck = dayGap(orderDate);
+            let datesBeforeOrder = dayGap(orderDate);
 
-            let str = $("#big").html();
-
-            console.log(house);
-
-            str += "<div class='small'>";
-            str += "<img class='tiny' src=" + house.Picture + ">";
+            let str = "";
+            str += "<div class='card'>";
+            str += "<div class='box'>";
+            str += "<div class='content'>";
+            str += "<img class='small'  src=" + house.Picture + " >";
+            str += "<p>" + house.Score + "★</p>";
             str += "<p>" + house.Name + "</p>";
 
-            if (btnCheck) {
-                str += "<button onclick='deleteOrder(" + house.Id + ")'>cancel</button>";
+            if (datesTillDone < 0) {
+                str += "<a href='#' onclick='showReviewLog(" + JSON.stringify(order) + ")'>add review</a>";
             }
+            else {
+                if (datesBeforeOrder > 2) {
+                    str += "<a href='#' onclick='deleteOrder(" + (order.Id).toString() + ")'>cancel</a>";
+                }
 
+            }
+            str += "</div>";
+            str += "</div>";
             str += "</div>";
 
-            $("#big").html(str);
+            if (datesTillDone < 0) {
+                let htmlStr = $("#done").html() + str;
+                $("#done").html(htmlStr);
+            }
+            else {
+                let htmlStr = $("#wait").html() + str;
+                $("#wait").html(htmlStr);
+            }
+
             counter++;
         }
 
         function deleteOrder(id) {
-            let user = JSON.parse(localStorage.getItem("user"));
-            let Email = user.Email;
-            let api = "../api/Houses/" + Email+"/"+id;
-            ajaxCall("DELETE", api, "", deleteOrderSuccessCB, deleteOrderErrorCB);
+
+            let orderData = {
+                Email: null,
+                houseId: null,
+                orderdIn: null,
+                orderdFor: null,
+                orderdOut: null,
+                Id: id
+            };
+
+            let api = "../api/Orders/delete";
+            ajaxCall("DELETE", api, JSON.stringify(orderData), deleteOrderSuccessCB, deleteOrderErrorCB);
         }
 
         function deleteOrderSuccessCB() {
@@ -139,12 +170,7 @@
             let currentDate = new Date();
 
             let diffInDays = Math.round((oDate - currentDate) / (1000 * 60 * 60 * 24));
-            if (diffInDays > 14) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return diffInDays;
         }
 
         function updateDeleteCounter() {
@@ -157,7 +183,8 @@
                 joinDate: user.JoinDate,
                 rentTotal: user.RentTotal,
                 cancelTotal: user.CancelTotal,
-                id: user.Id
+                id: user.Id,
+                totalIncome: user.TotalIncome
             }
             let api = "../api/Users/Cancel";
             ajaxCall("PUT", api, JSON.stringify(userData), updateCounterSuccessCB, updateCounterErrorCB);
@@ -173,10 +200,75 @@
         }
 
 
+        function showReviewLog(orderData) {
+
+            let upload = JSON.stringify(orderData);
+            localStorage.setItem("order", upload);
+
+            $("#done").html("");
+            $("#wait").html("");
+
+            let str = "<h4>we hope u enjoyed your house rent with our website !</h4> ";
+            str += "<h5>please leave your review:<h5>";
+            str += "<input type='text' id='textbox'>";
+
+            str += "<button id='btn'>add review</button>"
+
+            $("#big").html(str);
+            $("#btn").click(uploadReview);
+        }
+
+        function uploadReview() {
+            let text = $("#textbox").val();
+            let day = new Date();
+            let order = JSON.parse(localStorage.getItem("order"));
+            let user = JSON.parse(localStorage.getItem("user"));
+
+            console.log(order);
+
+            let ReviewData = {
+                Comments: text,
+                Date: null,
+                Id: null,
+                ListingId: order.HouseId,
+                ReviewerId: user.Id,
+                ReviewerName: user.Email
+            };
+
+
+            let api = "../api/Reviews";
+            ajaxCall("POST", api, JSON.stringify(ReviewData), addReviewSuccessCB, addReviewErrorCB);
+
+        }
+
+        function addReviewSuccessCB() {
+            let order = JSON.parse(localStorage.getItem("order"));            
+            let orderData = {
+                Email: null,
+                houseId: null,
+                orderdIn: null,
+                orderdFor: null,
+                orderdOut: null,
+                Id: order.Houseid,
+            };
+
+            let api = "../api/Orders/delete";
+            ajaxCall("DELETE", api, JSON.stringify(orderData), quickDeleteSuccessCB, deleteOrderErrorCB);
+        }
+
+        function quickDeleteSuccessCB() {
+            indexHerf();
+        }
+
+        function addReviewErrorCB(err) {
+            console.log(err);
+        }
+
     </script>
 
 </head>
 <body>
+
 
     <div id="logo">
 
@@ -185,16 +277,20 @@
             <button id="signUp">sign up</button>
         </div>
 
-        <img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />
-        <h1>Ruppin Rent</h1>
+
+        <img id="logoPic" class="center" style="width: 600px; height: 400px;" src="../ruppinLogo/logo.png" />
+        <!--<img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />-->
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     </div>
 
 
-    <div id="big">
-        <h3>MY ORDERS</h3>
-    </div>
+    <div id="big"></div>
 
+    <div id="done" class="container"></div>
 
+    <div id="wait" class="container"></div>
 
 </body>
 </html>

@@ -15,6 +15,7 @@ namespace RuppinRent.Models
         DateTime joinDate;
         int rentTotal;
         int cancelTotal;
+        int totalIncome;
         int id;
         public User() { }
 
@@ -29,7 +30,7 @@ namespace RuppinRent.Models
             this.id = 0;
         }
 
-        public User(string Email, string Password, string Username ,DateTime JoinDate,int RentTotal,int CancelTotal ,int Id)
+        public User(string Email, string Password, string Username, DateTime JoinDate, int RentTotal, int CancelTotal, int Id, int totalIncome)
         {
             this.email = Email;
             this.password = Password;
@@ -37,7 +38,8 @@ namespace RuppinRent.Models
             this.joinDate = JoinDate;
             this.rentTotal = RentTotal;
             this.cancelTotal = CancelTotal;
-            this.id=Id;
+            this.id = Id;
+            this.totalIncome = totalIncome;
         }
 
         public string Email { get => email; set => email = value; }
@@ -47,6 +49,7 @@ namespace RuppinRent.Models
         public int RentTotal { get => rentTotal; set => rentTotal = value; }
         public int CancelTotal { get => cancelTotal; set => cancelTotal = value; }
         public int Id { get => id; set => id = value; }
+        public int TotalIncome { get => totalIncome; set => totalIncome = value; }
 
 
 
@@ -86,5 +89,13 @@ namespace RuppinRent.Models
             ds.CancelUpdateMinus(u);
             return 1;
         }
+
+        public int DeleteUser(int id)
+        {
+            DataServices ds = new DataServices();
+            ds.DeleteUser(id);
+            return 1;
+        }
+
     }
 }

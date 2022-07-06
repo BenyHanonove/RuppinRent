@@ -19,11 +19,13 @@ namespace RuppinRent.Models
         char superHost;
         int minimumNights;
         int maximumNights;
+        int beds;
+        float latitude;
+        float longitude;
 
-
-        public House(long Id ,string Name ,string Description ,string Picture , string Neighbourhoood ,
-            string NeighbourhooodOverview ,float Score ,string Price , char SuperHost ,
-            int MinimumNights , int MaximumNights)
+        public House(long Id, string Name, string Description, string Picture, string Neighbourhoood,
+            string NeighbourhooodOverview, float Score, string Price, char SuperHost,
+            int MinimumNights, int MaximumNights, int Beds, float Latitude, float Longitude)
         {
             this.id = Id;
             this.name = Name;
@@ -36,6 +38,9 @@ namespace RuppinRent.Models
             this.superHost = SuperHost;
             this.minimumNights = MinimumNights;
             this.maximumNights = MaximumNights;
+            this.beds = Beds;
+            this.latitude = Latitude;
+            this.longitude = Longitude;
         }
 
         public House() { }
@@ -51,6 +56,9 @@ namespace RuppinRent.Models
         public char SuperHost { get => superHost; set => superHost = value; }   
         public int MinimumNights { get => minimumNights; set => minimumNights = value; }
         public int MaximumNights { get => maximumNights; set => maximumNights = value; }
+        public int Beds { get => beds; set => beds = value; }
+        public float Latitude { get => latitude; set => latitude = value; }
+        public float Longitude { get => longitude; set => longitude = value; }
 
         public List<House> GetHouses()
         {
@@ -59,12 +67,6 @@ namespace RuppinRent.Models
             return houses;
         }
 
-        public List<House> GetHousesByName(string name)
-        {
-            DataServices ds = new DataServices();
-            List<House> houses = ds.GetHousesByName(name);
-            return houses;
-        }
 
         public House GetHouse(long id)
         {
