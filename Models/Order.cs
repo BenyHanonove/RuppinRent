@@ -15,20 +15,23 @@ namespace RuppinRent.Models
         int id; 
         DateTime orderdOut;
         string price;
+        int uploadReview;
+
 
         public Order() { }
 
 
-        public Order(string Email, long HouseId,DateTime OrderFor ,DateTime OrderOut)
+        public Order(string Email, long HouseId,DateTime OrderFor ,DateTime OrderOut, int UploadReview)
         {
             this.email = Email;
             this.houseId = HouseId;
             this.orderdIn = DateTime.Now;
             this.orderdFor = OrderFor;
             this.orderdOut = OrderOut;
+            this.uploadReview = UploadReview;
         }
 
-        public Order(string Email, long HouseId, DateTime OrderdIn, DateTime OrderFor, int Id, DateTime OrderOut, string price)
+        public Order(string Email, long HouseId, DateTime OrderdIn, DateTime OrderFor, int Id, DateTime OrderOut, string price,int UploadReview)
         {
             this.email = Email;
             this.houseId = HouseId;
@@ -37,6 +40,7 @@ namespace RuppinRent.Models
             this.id = Id;
             this.orderdOut = OrderOut;
             this.price = price;
+            this.uploadReview = UploadReview;
         }
 
 
@@ -47,7 +51,7 @@ namespace RuppinRent.Models
         public int Id { get => id; set => id = value; }
         public DateTime OrderdOut { get => orderdOut; set => orderdOut = value; }
         public string Price { get => price; set => price = value; }
-
+        public int UploadReview { get => uploadReview; set => uploadReview = value; } 
 
         public string StringDateIn()
         {

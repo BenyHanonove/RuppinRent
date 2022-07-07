@@ -226,8 +226,8 @@ namespace RuppinRent.Models.DAL
         {
             SqlConnection con = Connect();
 
-            string commStr = "INSERT INTO Orders (houseId,email,orderdIn,orderFor,orderdOut,totalPrice)" +
-            "values("+o.HouseId+",'"+o.Email+"', '"+o.StringDateIn()+"', '"+o.StringDateFor()+"','"+ o.StringDateOut()+ "','" + o.Price + "')"; 
+            string commStr = "INSERT INTO Orders (houseId,email,orderdIn,orderFor,orderdOut,totalPrice,uploadReview)" +
+            "values("+o.HouseId+",'"+o.Email+"', '"+o.StringDateIn()+"', '"+o.StringDateFor()+"','"+ o.StringDateOut()+ "','" + o.Price + "',0)"; 
 
             SqlCommand command = CreateCommand(commStr, con);
             // Execute
@@ -257,8 +257,9 @@ namespace RuppinRent.Models.DAL
                 int id = Convert.ToInt32(dr["id"]);
                 DateTime orderdOut = Convert.ToDateTime(dr["orderdOut"]);
                 string price = dr["totalPrice"].ToString();
+                int uploadReview=Convert.ToInt32(dr["uploadReview"]);
 
-                orders.Add(new Order(email, houseId, orderedIn,orderFor,id,orderdOut, price));
+                orders.Add(new Order(email, houseId, orderedIn,orderFor,id,orderdOut, price, uploadReview));
             }
 
             return orders;
@@ -283,8 +284,10 @@ namespace RuppinRent.Models.DAL
                 int id = Convert.ToInt32(dr["id"]);
                 DateTime orderdOut = Convert.ToDateTime(dr["orderdOut"]);
                 string price = dr["totalPrice"].ToString();
+                int uploadReview = Convert.ToInt32(dr["uploadReview"]);
 
-                orders.Add(new Order(email, houseId, orderedIn, orderFor, id, orderdOut, price));
+
+                orders.Add(new Order(email, houseId, orderedIn, orderFor, id, orderdOut, price, uploadReview));
             }
 
             return orders;
@@ -309,8 +312,10 @@ namespace RuppinRent.Models.DAL
                 int id = Convert.ToInt32(dr["id"]);
                 DateTime orderdOut = Convert.ToDateTime(dr["orderdOut"]);
                 string price = dr["totalPrice"].ToString();
+                int uploadReview = Convert.ToInt32(dr["int UploadReview"]);
 
-                orders.Add(new Order(email, houseId, orderedIn, orderFor, id, orderdOut, price));
+
+                orders.Add(new Order(email, houseId, orderedIn, orderFor, id, orderdOut, price, uploadReview));
             }
 
             return orders;
@@ -409,6 +414,8 @@ namespace RuppinRent.Models.DAL
 
             string commStr = "INSERT INTO Reviews (listing_id , id , date ,reviewer_id , reviewer_name , comments )" +
                 "values(" + r.ListingId + ",666,'" + r.NowDateTime() + "'," + r.ReviewerId + ",'" + r.ReviewerName + "','" + r.Comments + "')";
+
+            commStr += "UPDATE Orders SET uploadReview =1  where houseId = " + r.ListingId + "and email ='" + r.ReviewerName + "'";
 
             SqlCommand command = CreateCommand(commStr, con);
             // Execute

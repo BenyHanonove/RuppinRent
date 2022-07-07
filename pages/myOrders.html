@@ -130,6 +130,8 @@
         //function that render the houses this user has
         function buildPage(house, order) {
 
+            console.log(order);
+
             let orderEnd = order.OrderdOut;
             let datesTillDone = dayGap(orderEnd);
             let orderDate = order.OrderdFor;
@@ -145,7 +147,12 @@
 
             //if the order has been finished then allow to have button add review
             if (datesTillDone < 0) {
-                str += "<a href='#' onclick='showReviewLog(" + JSON.stringify(order) + ")'>add review</a>";
+                if (order.UploadReview == 0) {
+                    str += "<a href='#' onclick='showReviewLog(" + JSON.stringify(order) + ")'>add review</a>";
+                }
+                else {
+                    str += "<a href='#''>already has review</a>";
+                }
             }
             //if order is in with biger range of 2 days allow to delete her
             else {
