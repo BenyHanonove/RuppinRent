@@ -312,7 +312,7 @@ namespace RuppinRent.Models.DAL
                 int id = Convert.ToInt32(dr["id"]);
                 DateTime orderdOut = Convert.ToDateTime(dr["orderdOut"]);
                 string price = dr["totalPrice"].ToString();
-                int uploadReview = Convert.ToInt32(dr["int UploadReview"]);
+                int uploadReview = Convert.ToInt32(dr["UploadReview"]);
 
 
                 orders.Add(new Order(email, houseId, orderedIn, orderFor, id, orderdOut, price, uploadReview));

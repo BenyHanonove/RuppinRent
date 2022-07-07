@@ -5,7 +5,7 @@
     <title></title>
 
     <!--<link rel="stylesheet" href="../style/style1.css" />-->
-    <link href="../style/cssgrids.css" rel="stylesheet" />
+    <!--<link href="../style/cssgrids.css" rel="stylesheet" />-->
     <link rel="stylesheet" href="../style/adminStyle.css" />
     <link rel="stylesheet" href="../style/style1.css" />
     <link href="../style/cssgrids.css" rel="stylesheet" />
@@ -13,15 +13,13 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-            crossorigin="anonymous">
-    </script>
+            crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-            crossorigin="anonymous">
-    </script>
+            crossorigin="anonymous"></script>
 
     <script>
 
@@ -176,7 +174,9 @@
             let check = true;
             let ownersArr = {};
             //    console.log(ownersArr)
-            let str = "<table class='styled-table'>";
+            let str = "<div style='width: 100%;'>";
+            str += "<h1>Hosts Table</h1>";
+            str += "<table class='styled-table'>";
 
             for (k in owners) {
 
@@ -219,6 +219,7 @@
 
 
             str += "</table>";
+            str += "</div>";
             $(".container").append(str);
 
         }
@@ -236,7 +237,9 @@
             let check = true;
             let houseObj = {};
 
-            let str = "<table class='styled-table'>";
+            let str = "<div style='width: 100%;'>";
+            str += "<h1>House Details Table</h1>";
+            str += "<table class='styled-table'>";
 
             for (i in House) {
 
@@ -275,6 +278,7 @@
             }
 
             str += "</table>";
+            str += "</div>";
             $(".container").append(str);
 
         }

@@ -132,10 +132,13 @@
 
             console.log(order);
 
-            let orderEnd = order.OrderdOut;
-            let datesTillDone = dayGap(orderEnd);
-            let orderDate = order.OrderdFor;
-            let datesBeforeOrder = dayGap(orderDate);
+            let orderEnd = dateTransfer(order.OrderdOut);
+            let currentDate = new Date();
+            let datesTillDone = Math.round((currentDate - orderEnd) / (1000 * 60 * 60 * 24));
+            let orderDate = dateTransfer(order.OrderdFor);
+            let datesBeforeOrder = Math.round((orderDate - currentDate) / (1000 * 60 * 60 * 24));
+
+            console.log(datesTillDone);
 
             let str = "";
             str += "<div class='card'>";
@@ -145,8 +148,9 @@
             str += "<p>" + house.Score + "★</p>";
             str += "<p>" + house.Name + "</p>";
 
+
             //if the order has been finished then allow to have button add review
-            if (datesTillDone < 0) {
+            if (datesTillDone > 0) {
                 if (order.UploadReview == 0) {
                     str += "<a href='#' onclick='showReviewLog(" + JSON.stringify(order) + ")'>add review</a>";
                 }
@@ -213,6 +217,7 @@
 
             let oDate = new Date(date[0], date[1], date[2]);
             let currentDate = new Date();
+
 
             let diffInDays = Math.round((oDate - currentDate) / (1000 * 60 * 60 * 24));
             return diffInDays;
@@ -319,6 +324,21 @@
         //if post successed
         function addReviewErrorCB(err) {
             console.log(err);
+        }
+
+        
+        function dateTransfer(date) {
+
+            let newDate = date.split("-");
+            for (let i = 0; i < 3; i++) {
+                newDate[i] = newDate[i].toString();
+            }
+            newDate[2] = newDate[2].substring(0, 2);
+
+
+
+            let oDate = new Date(newDate[0], (newDate[1] - 1), newDate[2]);
+            return oDate;
         }
 
     </script>
