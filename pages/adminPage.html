@@ -3,6 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
+
+    <!--<link rel="stylesheet" href="../style/style1.css" />-->
+    <link href="../style/cssgrids.css" rel="stylesheet" />
     <link rel="stylesheet" href="../style/adminStyle.css" />
     <link rel="stylesheet" href="../style/style1.css" />
     <link href="../style/cssgrids.css" rel="stylesheet" />
@@ -30,13 +33,9 @@
             activeUser();
             loadUsers();
             loadOwners();
+            loadHousesInfo();
+            adminCheck();
         });
-
-        function loadHouses() {
-            let api = "../api/Houses";
-            ajaxCall("GET", api, "", getHousesSuccessCB, getHousesErrorCB);
-        }
-
 
         function activeUser() {
 
@@ -67,6 +66,17 @@
         function logOut() {
             localStorage.clear();
             indexHerf();
+        }
+
+
+
+        function adminCheck() {
+            if (localStorage.getItem('user') != null) {
+                let active = JSON.parse(localStorage.getItem("user"));
+                if (!(active.Email == "admin@gmail.com")) {
+                    window.location.href = 'index.html';
+                }
+            }
         }
 
 
@@ -123,13 +133,13 @@
             for (k in users) {
                 if (check) {
                     str += "<tr class='active-row'>";
-                str += "<th> Email</th >";
-                str += "<th>Username</th>";
-                str += "<th>Password</th>";
-                str += "<th>Join Date</th>";
-                str += "<th>Rent count</th>";
-                str += "<th>Cancel count</th>";
-                str += "<th>id</th>";
+                    str += "<th> Email</th >";
+                    str += "<th>Username</th>";
+                    str += "<th>Password</th>";
+                    str += "<th>Join Date</th>";
+                    str += "<th>Rent count</th>";
+                    str += "<th>Cancel count</th>";
+                    str += "<th>id</th>";
                     str += "<th>totalIncome</th>";
                     str += "</tr>";
                     check = false;
@@ -165,17 +175,18 @@
         function getOwnersSuccessCB(owners) {
             let check = true;
             let ownersArr = {};
-        //    console.log(ownersArr)
+            //    console.log(ownersArr)
             let str = "<table class='styled-table'>";
 
             for (k in owners) {
 
                 if (check) {
                     str += "<tr class='active-row'>";
-                    str += "<th>host name</th>";
-                    str += "<th>host since</th>";  
-                    str += "<th>host id</th >";
-                    str += "<th>total income</th >";
+                    str += "<th>Host name</th>";
+                    str += "<th>Host since</th>";
+                    str += "<th>host Id</th >";
+                    str += "<th>Total income</th >";
+                    str += "<th>Total cancels</th >";
 
                     str += "</tr>";
                     check = false;
@@ -185,26 +196,27 @@
                 } else {
                     ownersArr[owners[k].HostId].push(owners[k].TotalPrice)
                 }
-               
+
             }
-            console.log(ownersArr)
+
             for (i in ownersArr) {
                 var checkTemp = true;
                 for (k in owners) {
-              // console.log( ownersArr[i])
+                    // console.log( ownersArr[i])
                     if (i == owners[k].HostId && checkTemp == true) {
                         str += "<tr>";
                         str += "<th>" + owners[k].HostName + "</th>";
                         str += "<th>" + owners[k].HostSince + "</th>";
                         str += "<th>" + owners[k].HostId + "</th>";
                         str += "<th>" + getArraySum(ownersArr[i]) + "</th>";
+                        str += "<th>" + owners[k].TotalCancels + "</th>";
 
                         str += "</tr>";
                         checkTemp = false;
                     }
                 }
             }
-   
+
 
             str += "</table>";
             $(".container").append(str);
@@ -215,7 +227,60 @@
             console.log(err);
         }
 
+        function loadHousesInfo() {
+            let api = "../api/Houseinfos";
+            ajaxCall("GET", api, "", getHousesInfoSuccessCB, getHousesInfoErrorCB);
+        }
 
+        function getHousesInfoSuccessCB(House) {
+            let check = true;
+            let houseObj = {};
+
+            let str = "<table class='styled-table'>";
+
+            for (i in House) {
+
+                if (check) {
+                    str += "<tr class='active-row'>";
+                    str += "<th>House ID</th>";
+                    str += "<th>Cancel Number</th>";
+                    str += "<th>Days rented</th >";
+
+
+                    str += "</tr>";
+                    check = false;
+                }
+                if (!houseObj[House[i].HouseId]) {
+                    houseObj[House[i].HouseId] = [House[i].RentNumOfDays]
+                } else {
+                    houseObj[House[i].HouseId].push(House[i].RentNumOfDays);
+                }
+            }
+
+
+            for (i in houseObj) {
+                var checkTemp = true;
+                for (k in House) {
+                    // console.log( ownersArr[i])
+                    if (i == House[k].HouseId && checkTemp == true) {
+                        str += "<tr>";
+                        str += "<th>" + House[k].HouseId + "</th>";
+                        str += "<th>" + House[k].TotalCancels + "</th>";
+                        str += "<th>" + getArraySum(houseObj[i]) + "</th>";
+
+                        str += "</tr>";
+                        checkTemp = false;
+                    }
+                }
+            }
+
+            str += "</table>";
+            $(".container").append(str);
+
+        }
+        function getHousesInfoErrorCB(err) {
+            console.log(err);
+        }
 
         function deleteUser(id) {
             console.log(id)
@@ -237,9 +302,6 @@
             console.log(err);
         }
 
-        function adminHerf() {
-            window.location.href = 'adminPage.html';
-        }
 
         function getArraySum(a) {
             var total = 0;

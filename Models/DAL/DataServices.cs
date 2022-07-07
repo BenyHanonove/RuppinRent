@@ -68,13 +68,11 @@ namespace RuppinRent.Models.DAL
         {
             SqlConnection con = Connect();
             //string commandStr = "select MIN(host_id) AS host_id ,host_name,host_since From Houses GROUP BY host_id";
-            string commandStr = "select Houses.id, Houses.host_id,Houses.host_name,Houses.host_since, Orders.totalPrice From Houses INNER JOIN Orders on Houses.id = Orders.houseId ";
-                
+            string commandStr = "  select Houses.id, Houses.host_id,Houses.host_name,Houses.host_since, ISNULL(Orders.totalPrice,0) AS totalPrice, Houses.cancelsNum From Houses LEFT JOIN Orders on Houses.id = Orders.houseId ";
+
+
             SqlCommand command = new SqlCommand(commandStr, con);
             SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);
-            //לקחת את הטבלה של הבתים לקחת את הטבלה של ההזמנות - אם האיידי של הבית קיים בשתי הטבלאות
-            //צריך למשוך את האונר של הבית  ולהוסיף לאונר שמשכנו אם הבית שלו היה קיים בהזמנות 
-            //את הטוטאל פרייס
             List<Owner> owners = new List<Owner>();
 
             while (dr.Read())
@@ -84,7 +82,8 @@ namespace RuppinRent.Models.DAL
                 string hostName = dr["host_name"].ToString() ;
                 DateTime hostSince = Convert.ToDateTime(dr["host_since"]);
                 int totalPrice = int.Parse(dr["totalPrice"].ToString());
-                owners.Add(new Owner(hostId, hostName, hostSince,totalPrice));
+                int totalCancels = int.Parse(dr["cancelsNum"].ToString());
+                owners.Add(new Owner(hostId, hostName, hostSince,totalPrice,totalCancels));
             }
 
             return owners;
@@ -116,11 +115,12 @@ namespace RuppinRent.Models.DAL
                 int Beds = Convert.ToInt32(dr["beds"]);
                 float Latitude = float.Parse(dr["latitude"].ToString());
                 float Longitude = float.Parse(dr["longitude"].ToString());
+                int CancelsNum = Convert.ToInt32(dr["cancelsNum"].ToString());
 
 
                 houses.Add(new House(Id, Name, Description, Picture, Neighbourhoood,
                     NeighbourhooodOverview, Score,Price,SuperHost,MinimumNights,Maximum_nights ,
-                    Beds , Latitude , Longitude));
+                    Beds , Latitude , Longitude, CancelsNum));
             }
 
             return houses;
@@ -154,10 +154,11 @@ namespace RuppinRent.Models.DAL
                 int Beds = Convert.ToInt32(dr["beds"].ToString());
                 float Latitude = float.Parse(dr["latitude"].ToString());
                 float Longitude = float.Parse(dr["longitude"].ToString());
+                int CancelsNum = Convert.ToInt32(dr["cancelsNum"].ToString());
 
                 house = new House(Id, Name, Description, Picture, Neighbourhoood,
                     NeighbourhooodOverview, Score, Price, SuperHost, MinimumNights, Maximum_nights,
-                    Beds, Latitude, Longitude);
+                    Beds, Latitude, Longitude, CancelsNum);
             }
 
             return house;
@@ -338,6 +339,45 @@ namespace RuppinRent.Models.DAL
 
             string commStr = "UPDATE Users SET rentTotal = RentTotal + 1, totalIncome = " + u.TotalIncome +
                 "where id =" + u.Id;
+
+            SqlCommand command = CreateCommand(commStr, con);
+            // Execute
+            int numAffected = command.ExecuteNonQuery();
+
+            con.Close();
+
+            return numAffected;
+        }
+
+        public List<Houseinfo> GetHouseInfo()
+        {
+            SqlConnection con = Connect();
+            //string commandStr = "select MIN(host_id) AS host_id ,host_name,host_since From Houses GROUP BY host_id";
+            string commandStr = "select Houses.id, ISNULL(DATEDIFF(day,Orders.orderFor, Orders.orderdOut),0) AS days, Houses.cancelsNum From [dbo].[Houses]  LEFT JOIN Orders on Houses.id = Orders.houseId";
+
+
+            SqlCommand command = new SqlCommand(commandStr, con);
+            SqlDataReader dr = command.ExecuteReader(CommandBehavior.CloseConnection);           
+            List<Houseinfo> h = new List<Houseinfo>();
+
+            while (dr.Read())
+            {
+
+                int houseId = Convert.ToInt32(dr["id"]);
+                int rentNumOfDays = int.Parse(dr["days"].ToString());
+                int totalCancels = int.Parse(dr["cancelsNum"].ToString());
+                h.Add(new Houseinfo(houseId, rentNumOfDays, totalCancels));
+            }
+
+            return h;
+        }
+
+        public int RentUpdatePlus(House h)
+        {
+            SqlConnection con = Connect();
+
+            string commStr = "UPDATE Houses SET cancelsNum = CancelsNum + 1" +
+                "where id =" + h.Id;
 
             SqlCommand command = CreateCommand(commStr, con);
             // Execute

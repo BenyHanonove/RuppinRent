@@ -9,30 +9,36 @@ using System.Web.Http;
 namespace RuppinRent.Models
 {
     public class Owner
-    {
 
+    {
         int hostId;
         string hostName;
         DateTime hostSince;
         int totalPrice;
+        int totalCancels;
+
+        public Owner(int host_id, string host_name, DateTime host_since, int totalPrice, int totalCancels)
+        {
+            this.hostId = host_id;
+            this.hostName = host_name;
+            this.hostSince = host_since;
+            this.totalPrice = totalPrice;
+            this.TotalCancels = totalCancels;
+        }
+
+      
 
 
         public int HostId { get => hostId; set => hostId = value; }
         public string HostName { get => hostName; set => hostName = value; }
         public DateTime HostSince { get => hostSince; set => hostSince = value; }
         public int TotalPrice { get => totalPrice; set => totalPrice = value; }
+        public int TotalCancels { get => totalCancels; set => totalCancels = value; }
 
         public Owner()
         {
         }
 
-        public Owner(int host_id, string host_name, DateTime host_since , int totalPrice)
-        {
-            this.hostId = host_id;
-            this.hostName = host_name;
-            this.hostSince = host_since;
-            this.totalPrice = totalPrice;
-        }
 
 
 

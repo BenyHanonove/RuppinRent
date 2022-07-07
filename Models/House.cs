@@ -22,10 +22,11 @@ namespace RuppinRent.Models
         int beds;
         float latitude;
         float longitude;
+        int cancelsNum;
 
         public House(long Id, string Name, string Description, string Picture, string Neighbourhoood,
             string NeighbourhooodOverview, float Score, string Price, char SuperHost,
-            int MinimumNights, int MaximumNights, int Beds, float Latitude, float Longitude)
+            int MinimumNights, int MaximumNights, int Beds, float Latitude, float Longitude, int CancelsNum)
         {
             this.id = Id;
             this.name = Name;
@@ -41,6 +42,8 @@ namespace RuppinRent.Models
             this.beds = Beds;
             this.latitude = Latitude;
             this.longitude = Longitude;
+            this.cancelsNum = CancelsNum;
+            
         }
 
         public House() { }
@@ -59,6 +62,7 @@ namespace RuppinRent.Models
         public int Beds { get => beds; set => beds = value; }
         public float Latitude { get => latitude; set => latitude = value; }
         public float Longitude { get => longitude; set => longitude = value; }
+        public int CancelsNum { get => cancelsNum; set => cancelsNum = value; }
 
         public List<House> GetHouses()
         {
@@ -73,6 +77,13 @@ namespace RuppinRent.Models
             DataServices ds = new DataServices();
             House house = ds.GetHouse(id);
             return house;
+        }
+
+        public int UpdateRentPlus(House h)
+        {
+            DataServices ds = new DataServices();
+            ds.RentUpdatePlus(h);
+            return 1;
         }
 
     }

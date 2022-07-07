@@ -11,30 +11,23 @@ using RouteAttribute = System.Web.Mvc.RouteAttribute;
 
 namespace RuppinRent.Controllers
 {
-    public class HousesController : ApiController
+    public class HouseinfosController : ApiController
     {
-        public IEnumerable<House> Get()
+        public IEnumerable<Houseinfo> Get()
         {
-            House h = new House();
-            List<House> houses = h.GetHouses();
+            Houseinfo hi = new Houseinfo();
+            List<Houseinfo> houses = hi.GetHouseInfo();
             return houses;
         }
 
 
-        public House Get(string id)
-        {
-            House h = new House();
-            long newId = Convert.ToInt64(id);
-            House house = h.GetHouse(newId);
-            return house;
-        }
 
-        [HttpPut]
-        [Route("api/Houses/data")]
-        public int PUT(House h)
+
+
+        //PUT api/<controller>/5
+        public int PUT(string id)
         {
-            // User user = new User();
-            return h.UpdateRentPlus(h);
+            return 1;
         }
 
 

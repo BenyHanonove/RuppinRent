@@ -17,10 +17,10 @@
     <script>
 
         //vars to have between all function
-        let houseData;
         let maxDays;
         let minDays;
         let HouseOrders;
+        let houseData;
 
         //the script that runs in the start of the html page
         $(document).ready(function () {
@@ -81,6 +81,8 @@
 
         //read from 
         function getHouseSuccessCB(house) {
+
+            houseData = house;
 
             //save points for the map im local storage
             localStorage.setItem("pointX", house.Latitude);

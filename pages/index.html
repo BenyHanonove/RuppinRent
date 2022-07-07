@@ -124,7 +124,16 @@
                 str += "</p>";
                 str += '<button id="logOut">LOG OUT</button>';
                 str += '<button id="orderBtn">MY ORDERS</button>';
+
+                if (active.Email = 'admin@gmail.com') {
+                    str += '<button id="adminBtn">ADMIN PAGE</button>';
+                }
+
                 $("#sign").html(str);
+
+                if (active.Email = 'admin@gmail.com') {
+                    $("#adminBtn").click(adminPageHerf);
+                }
                 $("#orderBtn").click(myOrdersHerf);
                 $("#logOut").click(logOut);
             }
@@ -141,6 +150,10 @@
 
             }
 
+        }
+
+        function adminHerf() {
+            window.location.href = 'adminPage.html';
         }
 
         //logout from user
@@ -170,6 +183,12 @@
         function myOrdersHerf() {
             window.location.href = 'myOrders.html';
         }
+
+        //change the html page
+        function adminPageHerf() {
+            window.location.href = 'adminPage.html';
+        }
+
 
         function dropDown() {
             document.getElementById("myDropdown").classList.toggle("show");
