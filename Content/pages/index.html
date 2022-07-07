@@ -1,0 +1,409 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <!--<link rel="stylesheet" href="../style/style1.css" />-->
+    <link href="../style/cssgrids.css" rel="stylesheet" />
+    <script src="../Scripts/ajaxCalls.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous">
+    </script>
+
+
+    <script>
+
+        let housesArr;
+        let OrdersArr;
+
+        //the script that runs in the start of the html page
+        $(document).ready(function () {
+            localStorage.removeItem("house");
+            $("#signIn").click(signInHerf);
+            $("#signUp").click(signUpHerf);
+            $("#logoPic").click(indexHerf);
+            $("#searchBtn").click(findHouses);
+            activeUser();
+            loadHouses();
+            loadOrders();
+        });
+
+        function loadOrders() {
+            let api = "../api/Orders";
+            ajaxCall("GET", api, "", getOrdersSuccessCB, getOrdersErrorCB);
+        }
+
+        function getOrdersSuccessCB(orders) {
+            OrdersArr = JSON.stringify(orders);
+        }
+
+        function getOrdersErrorCB(err) {
+            console.log(err)
+        }
+        //funtion load the houses from the server
+        function loadHouses() {
+            let api = "../api/Houses";
+            ajaxCall("GET", api, "", getHousesSuccessCB, getHousesErrorCB);
+        }
+
+        //funtion get
+        function getHousesSuccessCB(houses) {
+
+            housesArr = JSON.stringify(houses);
+
+            let str1 = "<p><h1>Top rated houses :</h1></p>";
+            let str = "";
+            let counter = 0;
+            let values = [];
+            let alreadyIn = false;
+
+            while (counter < 6) {
+                let i = Math.floor(Math.random() * 100);
+                alreadyIn = false;
+
+                for (let j = 0; j < values.length; j++) {
+                    if (values[j] == i) {
+                        alreadyIn = true;
+                    }
+                }
+
+                if (houses[i].Score > 4.7 && alreadyIn == false) {
+                    values[counter] = i;
+
+
+                    str += "<div class='card'>";
+                    str += "<div class='box'>";
+                    str += "<div class='content'>";
+                    str += "<div class='hName'>" + houses[i].Name + "</div>";
+                    str += "<img style='width:250px; height:250px;'  src=" + houses[i].Picture + " >";
+                    str += "<p>" + houses[i].Score + "★</p>";
+                    str += "<a href='#' onclick='viewHouseInfo(" + (houses[i].Id).toString() + ")'>read more</a>";
+                    str += "</div>";
+                    str += "</div>";
+                    str += "</div>";
+
+                    counter++;
+                }
+
+            }
+            $(".container1").append(str1);
+            $(".container").html(str);
+        }
+
+
+        function getHousesErrorCB(err) {
+            console.log(err);
+        }
+
+        function viewHouseInfo(id) {
+
+            localStorage.setItem("house", id);
+            window.location.href = 'houseInfo.html';
+
+        }
+
+        function activeUser() {
+
+            if (localStorage.getItem("user") != null) {
+                let active = JSON.parse(localStorage.getItem("user"));
+                let str = "<p>Hello <br>";
+                str += active.Username;
+                str += "</p>";
+                str += '<button id="logOut">LOG OUT</button>';
+                str += '<button id="orderBtn">MY ORDERS</button>';
+                $("#sign").html(str);
+                $("#orderBtn").click(myOrdersHerf);
+                $("#logOut").click(logOut);
+            }
+            else {
+
+                let str = "<p>Hello Guest<br>";
+                str += "</p>";
+                str += '<button id="signIn">sign in</button>';
+                str += '<button id="signUp">sign up</button>';
+                $("#sign").html(str);
+                $("#signIn").click(signInHerf);
+                $("#signUp").click(signUpHerf);
+
+            }
+
+        }
+
+
+        function logOut() {
+            localStorage.clear();
+            indexHerf();
+        }
+
+
+        function signInHerf() {
+            localStorage.clear();
+            window.location.href = 'signIn.html';
+        }
+
+        function signUpHerf() {
+            localStorage.clear();
+            window.location.href = 'signUp.html';
+        }
+
+        function indexHerf() {
+            window.location.href = 'index.html';
+        }
+
+        function myOrdersHerf() {
+            window.location.href = 'myOrders.html';
+        }
+
+        function dropDown() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+
+        function zoom(direction) {
+            var filterID = event.target.value;
+            console.log(filterID, direction);
+            var slider = $("#" + filterID);
+            var step = parseInt(slider.attr('step'), 10);
+            var currentSliderValue = parseInt(slider.val(), 10);
+            console.log(step)
+            var newStepValue = currentSliderValue + step;
+
+            if (direction === "out") {
+                newStepValue = currentSliderValue - step;
+            } else {
+                newStepValue = currentSliderValue + step;
+            }
+
+            slider.val(newStepValue).change();
+        };
+
+
+        function findHouses() {
+
+
+            let houses = JSON.parse(housesArr);
+            let orders = JSON.parse(OrdersArr);
+            let subString = $("#searchBox").val();
+            let minScore = $("#sliderScore").val();
+            let minBeds = $("#sliderBeds").val();
+            let maxPrice = $("#maxP").val();
+            let minPrice = $("#minP").val();
+
+
+            let subArr = [];
+            for (let i = 0; i < houses.length; i++) {
+                if (minScore <= houses[i].Score) {
+                    if (minBeds <= houses[i].Beds) {
+                        let name = houses[i].Name;
+                        let result = name.includes(subString);
+                        if (result) {
+
+                            let nowPrice = houses[i].Price;
+                            let p = parseFloat(nowPrice.replace('$', ''));
+
+                            if (p >= minPrice && p <= maxPrice) {
+                                subArr.push(houses[i]);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            let inputDate = $("#userDate").val();
+
+            if (inputDate != "") {
+
+                let input = dateTransfer(inputDate);
+
+                let badIds = [];
+
+                for (let j = 0; j < orders.length; j++) {
+                    let start = new Date(orders[j].OrderdFor);
+                    let end = new Date(orders[j].OrderdOut);
+
+                    let dateArr = DatesBtween(start, end);
+
+                    for (let k = 0; k < dateArr.length; k++) {
+
+                        let dateDiff = Math.round(input - dateArr[k]) / (1000 * 60 * 60 * 24);
+
+                        if (dateDiff == 0) {
+                            badIds.push(orders[j].HouseId);
+                        }
+                    }
+                }
+
+                let arr = [];
+                let check;
+
+                for (let i = 0; i < subArr.length; i++) {
+                    check = true;
+
+                    for (let j = 0; j < badIds.length; j++) {
+                        if (subArr[i].Id == badIds[j]) {
+                            check = false;
+                        }
+                    }
+
+                    if (check) {
+                        arr.push(subArr[i]);
+                    }
+                }
+
+                subArr = arr;
+            }
+
+
+            console.log(subArr);
+
+            let str = "";
+            for (let j = 0; j < subArr.length; j++) {
+                str += "<div class='card'>";
+                str += "<div class='box'>";
+                str += "<div class='content'>";
+                str += "<div class='hName'>" + subArr[j].Name + "</div>";
+                str += "<img class='small'  src=" + subArr[j].Picture + " >";
+                str += "<p>" + subArr[j].Score + "★</p>";
+                str += "<a href='#' onclick='viewHouseInfo(" + (subArr[j].Id).toString() + ")'>read more</a>";
+                str += "</div>";
+                str += "</div>";
+                str += "</div>";
+
+            }
+            $(".container").html(str);
+        }
+
+
+        function dateTransfer(date) {
+
+            let newDate = date.split("-");
+            for (let i = 0; i < 3; i++) {
+                newDate[i] = newDate[i].toString();
+            }
+            newDate[2] = newDate[2].substring(0, 2);
+
+
+
+            let oDate = new Date(newDate[0], (newDate[1] - 1), newDate[2]);
+            return oDate;
+        }
+
+
+
+
+        function DatesBtween(start, end) {
+            DatesArr = [];
+
+            while (start <= end) {
+                DatesArr.push(new Date(start));
+                start.setDate(start.getDate() + 1)
+
+            }
+
+            return DatesArr;
+        }
+
+        function getPrice(price) {
+            console.log(price);
+        }
+
+
+
+
+    </script>
+
+</head>
+<body>
+
+    <div id="logo">
+
+        <div id="sign">
+            <button id="signIn">sign in</button>
+            <button id="signUp">sign up</button>
+
+        </div>
+    </div>
+    <div style="width:99.99%; text-align:center;">
+        <img id="logoPic" class="center" style="width: 600px; height: 400px;" src="../ruppinLogo/logo.png" />
+    </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <div id="logo" class="container1">
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>minimum<br>score<p>
+                        <br />
+                        <input id="sliderScore" type="range" class="range" min="0" max="5" step="0.01" onchange="findHouses()" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>number of beds<p>
+                        <br />
+                        <input id="sliderBeds" type="range" class="range" min="0" max="15" step="1" onchange="findHouses()" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>start day<p>
+                        <br />
+                        <input type='date' id='userDate'>"
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>minimun price<p>
+                        <br />
+                        <input id="minP" type="range" class="range" min="0" max="500" step="0.1" onchange="findHouses()" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>maximum<br>price<p>
+                        <br />
+                        <input id="maxP" type="range" class="range" min="0" max="500" step="0.1" onchange="findHouses()" value="500">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <button id="searchBtn">search</button>
+                    <input type="search" id="searchBox" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+                <div id="big">
+
+                </div>
+
+                <div class="container" style="padding-top:300px">
+
+
+                </div>
+
+
+</body>
+</html>

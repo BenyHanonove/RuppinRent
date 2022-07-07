@@ -18,25 +18,32 @@
 
     <script>
 
+        //the script that runs in the start of the html page
         $(document).ready(function () {
             $("#signUp").click(signUpHerf);
             $("#logoPic").click(indexHerf);
             $("#enter").click(LogIn);
         });
 
-        function signUpHerf() {
-            window.location.href = 'signUp.html';
-        }
-
+        //change the html page
         function indexHerf() {
             window.location.href = 'index.html';
         }
 
+        //change the html page
+        function signUpHerf() {
+            localStorage.clear();
+            window.location.href = 'signUp.html';
+        }
+
+
+        //function load users from DB
         function LogIn() {
             let api = "../api/Users";
             ajaxCall("GET", api, "", getUsersSuccessCB, getUsersErrorCB);
         }
 
+        //if get successed
         function getUsersSuccessCB(users) {
 
             let error = 1;
@@ -73,6 +80,7 @@
 
         }
 
+        //if get fails
         function getUsersErrorCB(err) {
             console.log(err);
         }

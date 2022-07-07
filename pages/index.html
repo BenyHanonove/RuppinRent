@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title></title>
 
-    <link rel="stylesheet" href="../style/style1.css" />
+    <!--<link rel="stylesheet" href="../style/style1.css" />-->
     <link href="../style/cssgrids.css" rel="stylesheet" />
     <script src="../Scripts/ajaxCalls.js"></script>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
             crossorigin="anonymous">
@@ -16,6 +16,7 @@
 
     <script>
 
+        //init of two static vars to keep data thouroght all functuions
         let housesArr;
         let OrdersArr;
 
@@ -31,54 +32,60 @@
             loadOrders();
         });
 
+        //read from server that get all the orders in the DB
         function loadOrders() {
             let api = "../api/Orders";
             ajaxCall("GET", api, "", getOrdersSuccessCB, getOrdersErrorCB);
         }
 
+        //if read successed
         function getOrdersSuccessCB(orders) {
             OrdersArr = JSON.stringify(orders);
         }
-
+        //if read fails
         function getOrdersErrorCB(err) {
             console.log(err)
         }
+
         //funtion load the houses from the server
         function loadHouses() {
             let api = "../api/Houses";
             ajaxCall("GET", api, "", getHousesSuccessCB, getHousesErrorCB);
         }
 
-        //funtion get 
+        //funtion get data from DB if read successed
         function getHousesSuccessCB(houses) {
 
             housesArr = JSON.stringify(houses);
 
+            //creation of dyamic string that will build the html page
             let str1 = "<p><h1>Top rated houses :</h1></p>";
             let str = "";
             let counter = 0;
             let values = [];
             let alreadyIn = false;
 
+            //loop that renders 6 random house with high score 
             while (counter < 6) {
                 let i = Math.floor(Math.random() * 100);
                 alreadyIn = false;
 
+                //check if the house already render
                 for (let j = 0; j < values.length; j++) {
                     if (values[j] == i) {
                         alreadyIn = true;
                     }
                 }
 
+                //dyamic string that create the html
                 if (houses[i].Score > 4.7 && alreadyIn == false) {
                     values[counter] = i;
-
 
                     str += "<div class='card'>";
                     str += "<div class='box'>";
                     str += "<div class='content'>";
                     str += "<div class='hName'>" + houses[i].Name + "</div>";
-                    str += "<img class='small'  src=" + houses[i].Picture + " >";
+                    str += "<img style='width:250px; height:250px;'  src=" + houses[i].Picture + " >";
                     str += "<p>" + houses[i].Score + "★</p>";
                     str += "<a href='#' onclick='viewHouseInfo(" + (houses[i].Id).toString() + ")'>read more</a>";
                     str += "</div>";
@@ -89,24 +96,27 @@
                 }
 
             }
-            $("#big").html(str1);
+            $(".container1").append(str1);
             $(".container").html(str);
         }
 
-
+        //if read fails
         function getHousesErrorCB(err) {
             console.log(err);
         }
 
+        //function that transfer us to other page
         function viewHouseInfo(id) {
-
             localStorage.setItem("house", id);
             window.location.href = 'houseInfo.html';
-
         }
 
+
+        //function that checks if there is user conncted to the system
         function activeUser() {
 
+            //check if local storage hold user
+            //add the need button for user
             if (localStorage.getItem("user") != null) {
                 let active = JSON.parse(localStorage.getItem("user"));
                 let str = "<p>Hello <br>";
@@ -118,6 +128,7 @@
                 $("#orderBtn").click(myOrdersHerf);
                 $("#logOut").click(logOut);
             }
+            //otherwise create button for guest 
             else {
 
                 let str = "<p>Hello Guest<br>";
@@ -132,27 +143,30 @@
 
         }
 
-
+        //logout from user
         function logOut() {
             localStorage.clear();
             indexHerf();
         }
 
-
+        //change the html page
         function signInHerf() {
             localStorage.clear();
             window.location.href = 'signIn.html';
         }
 
+        //change the html page
         function signUpHerf() {
             localStorage.clear();
             window.location.href = 'signUp.html';
         }
 
+        //change the html page
         function indexHerf() {
             window.location.href = 'index.html';
         }
 
+        //change the html page
         function myOrdersHerf() {
             window.location.href = 'myOrders.html';
         }
@@ -161,68 +175,124 @@
             document.getElementById("myDropdown").classList.toggle("show");
         }
 
-            function zoom(direction) {
-                var filterID = event.target.value;
-                console.log(filterID, direction);
-                var slider = $("#" + filterID);
-                var step = parseInt(slider.attr('step'), 10);
-                var currentSliderValue = parseInt(slider.val(), 10);
-                console.log(step)
-                var newStepValue = currentSliderValue + step;
+        function zoom(direction) {
+            var filterID = event.target.value;
+            console.log(filterID, direction);
+            var slider = $("#" + filterID);
+            var step = parseInt(slider.attr('step'), 10);
+            var currentSliderValue = parseInt(slider.val(), 10);
+            console.log(step)
+            var newStepValue = currentSliderValue + step;
 
-                if (direction === "out") {
-                    newStepValue = currentSliderValue - step;
-                } else {
-                    newStepValue = currentSliderValue + step;
-                }
+            if (direction === "out") {
+                newStepValue = currentSliderValue - step;
+            } else {
+                newStepValue = currentSliderValue + step;
+            }
 
-                slider.val(newStepValue).change();
-            };
+            slider.val(newStepValue).change();
+        };
 
-
+        //function that gets the filter and return the specific houses
         function findHouses() {
 
+            //var from the html page
             let houses = JSON.parse(housesArr);
+            let orders = JSON.parse(OrdersArr);
             let subString = $("#searchBox").val();
             let minScore = $("#sliderScore").val();
             let minBeds = $("#sliderBeds").val();
+            let maxPrice = $("#maxP").val();
+            let minPrice = $("#minP").val();
 
 
+            //creation of new arr and push there the houses fits the filters
             let subArr = [];
-            let dateVaild;
             for (let i = 0; i < houses.length; i++) {
+                if (minScore <= houses[i].Score) {
+                    //house min beds filter
+                    if (minBeds <= houses[i].Beds) {
 
-
-                if (minScore < houses[i].Score) {
-                    if (minBeds < houses[i].Beds) {
+                        //house name filter
                         let name = houses[i].Name;
                         let result = name.includes(subString);
                         if (result) {
 
-                            
+                            //house min max price filter
+                            let nowPrice = houses[i].Price;
+                            let p = parseFloat(nowPrice.replace('$', ''));
 
-                            for (let j = 0; j < OrdersArr.length; j++) {
-                                
-                            }
-
-                            if (dateVaild) {
+                            if (p >= minPrice && p <= maxPrice) {
+                                //add house to new arr
                                 subArr.push(houses[i]);
                             }
-
                         }
                     }
                 }
             }
 
-            
+            //load date filter from html page 
+            let inputDate = $("#userDate").val();
 
+            //if not empty do this
+            if (inputDate != "") {
+
+
+                let input = dateTransfer(inputDate);
+                //new arr with the house id we want to remove
+                let badIds = [];
+
+
+                for (let j = 0; j < orders.length; j++) {
+                    let start = new Date(orders[j].OrderdFor);
+                    let end = new Date(orders[j].OrderdOut);
+
+                    //arr that get all dates btween
+                    let dateArr = DatesBtween(start, end);
+
+                    for (let k = 0; k < dateArr.length; k++) {
+
+                        //gets diff between dates
+                        let dateDiff = Math.round(input - dateArr[k]) / (1000 * 60 * 60 * 24);
+
+                        if (dateDiff == 0) {
+                            //add id we want to remove
+                            badIds.push(orders[j].HouseId);
+                        }
+                    }
+                }
+
+                //new vars for remove houses
+                let arr = [];
+                let check;
+
+                //loops that remove the house id we want to remove because of the date filter
+                for (let i = 0; i < subArr.length; i++) {
+                    check = true;
+
+                    for (let j = 0; j < badIds.length; j++) {
+                        if (subArr[i].Id == badIds[j]) {
+                            check = false;
+                        }
+                    }
+
+                    if (check) {
+                        arr.push(subArr[i]);
+                    }
+                }
+
+                subArr = arr;
+            }
+
+
+            //render of the html of the houses to choose
             let str = "";
             for (let j = 0; j < subArr.length; j++) {
                 str += "<div class='card'>";
                 str += "<div class='box'>";
                 str += "<div class='content'>";
                 str += "<div class='hName'>" + subArr[j].Name + "</div>";
-                str += "<img class='small'  src=" + subArr[j].Picture + " >";
+                str += "<img style='width:250px ; height:250px ;'  src=" + subArr[j].Picture + " >";
                 str += "<p>" + subArr[j].Score + "★</p>";
                 str += "<a href='#' onclick='viewHouseInfo(" + (subArr[j].Id).toString() + ")'>read more</a>";
                 str += "</div>";
@@ -230,14 +300,29 @@
                 str += "</div>";
 
             }
-
-            $("#big").html("");
             $(".container").html(str);
         }
 
+        //function to convert dates
+        function dateTransfer(date) {
 
-        function validDate(start, end,input) {
-            let DatesArr = [];
+            let newDate = date.split("-");
+            for (let i = 0; i < 3; i++) {
+                newDate[i] = newDate[i].toString();
+            }
+            newDate[2] = newDate[2].substring(0, 2);
+
+
+
+            let oDate = new Date(newDate[0], (newDate[1] - 1), newDate[2]);
+            return oDate;
+        }
+
+
+
+        //function that return arr of the dates between two dates
+        function DatesBtween(start, end) {
+            DatesArr = [];
 
             while (start <= end) {
                 DatesArr.push(new Date(start));
@@ -245,13 +330,9 @@
 
             }
 
-            for (let i = 0; i < DatesArr.length; i++) {
-                if (input == DatesArr[i]) {
-                    return false;
-                }
-                return true;
-            }
+            return DatesArr;
         }
+
 
     </script>
 
@@ -263,37 +344,87 @@
         <div id="sign">
             <button id="signIn">sign in</button>
             <button id="signUp">sign up</button>
-        </div>
-
-
-        <div id="filter">
-            <input type="search" id="searchBox" />
-            <button id="searchBtn">search</button>
-            <br />
-            <p>minimum score                  number of beds <p>
-            <br/>
-            <input id="sliderScore" type="range" min="0" max="5" step="0.1" onchange="findHouses()" value="0">
-            <input id="sliderBeds" type="range" min="0" max="15" step="1" onchange="findHouses()" value="0" >
 
         </div>
-
+    </div>
+    <div style="width:99.99%; text-align:center;">
         <img id="logoPic" class="center" style="width: 600px; height: 400px;" src="../ruppinLogo/logo.png" />
-        <!--<img id="logoPic" class="center" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUtXYroKYwmQyjRYfxOoaqstjf0uSYuuFpaA&usqp=CAU" />-->
+    </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <div id="logo" class="container1">
 
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>minimum<br>score<p>
+                        <br />
+                        <input id="sliderScore" type="range" class="range" min="0" max="5" step="0.01" onchange="findHouses()" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>number of beds<p>
+                        <br />
+                        <input id="sliderBeds" type="range" class="range" min="0" max="15" step="1" onchange="findHouses()" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>start day<p>
+                        <br />
+                        <input type='date' id='userDate'>"
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>minimun price<p>
+                        <br />
+                        <input id="minP" type="range" class="range" min="0" max="500" step="0.1" onchange="findHouses()" value="0">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <p>maximum<br>price<p>
+                        <br />
+                        <input id="maxP" type="range" class="range" min="0" max="500" step="0.1" onchange="findHouses()" value="500">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="box">
+                <div class="content">
+                    <button id="searchBtn">search</button>
+                    <input type="search" id="searchBox" />
+                </div>
+            </div>
+        </div>
 
     </div>
 
+                <div id="big">
 
-    <div id="big">
+                </div>
 
-    </div>
-
-    <div class="container">
+                <div class="container" style="padding-top:300px">
 
 
-    </div>
+                </div>
+
+
 </body>
 </html>

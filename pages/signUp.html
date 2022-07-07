@@ -17,26 +17,31 @@
 
     <script>
 
+        //the script that runs in the start of the html page
         $(document).ready(function () {
             $("#signIn").click(signInHerf);
             $("#logoPic").click(indexHerf);
             $("#enter").click(BuildUser);
         });
 
+
+        //change the html page
         function signInHerf() {
+            localStorage.clear();
             window.location.href = 'signIn.html';
-            }
+        }
 
-
+        //change the html page
         function indexHerf() {
             window.location.href = 'index.html';
-            }
+        }
 
+        //function that get user input and create user object
         function BuildUser() {
             let email = document.getElementById('emailBox');
-        let password = document.getElementById('passwordBox');
-        let username = document.getElementById('usernameBox');
-        let currentDate = new Date();
+            let password = document.getElementById('passwordBox');
+            let username = document.getElementById('usernameBox');
+            let currentDate = new Date();
 
             if (ValidateEmail(email)) {
                 if (password_validation(password, 6, 12)) {
@@ -56,82 +61,78 @@
                 }
             }
         }
-            function addUser(user) {
-                console.log(user);
-                let api = "../api/Users";
-                localStorage.clear();
-                ajaxCall("POST", api, JSON.stringify(user), addUserSuccessCB, addUserErrorCB);
-            }
+   
+        //function that add useer to DB
+        function addUser(user) {
+            console.log(user);
+            let api = "../api/Users";
+            localStorage.clear();
+            ajaxCall("POST", api, JSON.stringify(user), addUserSuccessCB, addUserErrorCB);
+        }
 
-            function addUserSuccessCB(status) {
+         //if post successed
+        function addUserSuccessCB(status) {
+            swal({
+                title: 'Congratulations, you have successfully registered',
+                icon: "success",
+                type: "success"
+            }).then(function () {
+                signInHerf();
+            });
+
+        }
+
+
+         //if post successed
+        function addUserErrorCB(err) {
+            console.log(err);
+        }
+
+        //function that check user input for password
+        function password_validation(password, my, mx) {
+            var password_len = password.value.length;
+            if (password_len == 0 || password_len < my || password_len > mx) {
                 swal({
-                    title: 'Congratulations, you have successfully registered',
-                    icon: "success",
-                    type: "success"
-                }).then(function () {
-                    signInHerf();
-                });
-
+                    title: "Password should not be empty / length be between " + my + " to " + mx,
+                    text: 'try again!',
+                    icon: "error",
+                    type: 'error'
+                })
+                password.focus();
+                return false;
             }
+            return true;
+        }
 
-            function addUserErrorCB(err) {
-                console.log(err);
-            }
-
-            function password_validation(password, my, mx) {
-                var password_len = password.value.length;
-                if (password_len == 0 || password_len < my || password_len > mx) {
-                    swal({
-                        title: "Password should not be empty / length be between " + my + " to " + mx,
-                        text: 'try again!',
-                        icon: "error",
-                        type: 'error'
-                    })
-                    password.focus();
-                    return false;
-                }
+        //function that check user input for email
+        function ValidateEmail(email) {
+            console.log(email.value)
+            var mailformat = /^([0-9a-zA-Z]([-_\\.]*[0-9a-zA-Z]+)*)@([0-9a-zA-Z]([-_\\.]*[0-9a-zA-Z]+)*)[\\.]([a-zA-Z]{2,9})$/;
+            console.log(email.value.match(mailformat))
+            if (email.value.match(mailformat)) {
                 return true;
             }
-
-            function ValidateEmail(email) {
-                console.log(email.value)
-                var mailformat = /^([0-9a-zA-Z]([-_\\.]*[0-9a-zA-Z]+)*)@([0-9a-zA-Z]([-_\\.]*[0-9a-zA-Z]+)*)[\\.]([a-zA-Z]{2,9})$/;
-                console.log(email.value.match(mailformat))
-                if (email.value.match(mailformat)) {
-                    return true;
-                }
-                else {
-                    swal({
-                        title: "You have entered an invalid email address!",
-                        text: 'try again!',
-                        icon: "error",
-                        type: 'error'
-                    })
-                    email.focus();
-                    return false;
-                }
+            else {
+                swal({
+                    title: "You have entered an invalid email address!",
+                    text: 'try again!',
+                    icon: "error",
+                    type: 'error'
+                })
+                email.focus();
+                return false;
             }
+        }
 
-            function alphanumeric(username, my, mx) {
-                var letters = /^[0-9a-zA-Z]+$/;
-                var username_len = username.value.length;
+        //function that check user input for username
+        function alphanumeric(username, my, mx) {
+            var letters = /^[0-9a-zA-Z]+$/;
+            var username_len = username.value.length;
 
-                if (username.value.match(letters)) {
-                    if (username_len == 0 || username_len < my || username_len > mx) {
-                        swal({
-                            title: "Username should not be empty / length be between " + mx + " to " + my,
-                            text: 'try again!',
-                            icon: "error",
-                            type: 'error'
-                        })
-                        username.focus();
-                        return false;
-                    }
-                    return true;
-                }
-                else {
+            if (username.value.match(letters)) {
+                if (username_len == 0 || username_len < my || username_len > mx) {
                     swal({
-                        title: 'Username must have alphanumeric characters only',
+                        title: "Username should not be empty / length be between " + mx + " to " + my,
                         text: 'try again!',
                         icon: "error",
                         type: 'error'
@@ -139,7 +140,19 @@
                     username.focus();
                     return false;
                 }
+                return true;
             }
+            else {
+                swal({
+                    title: 'Username must have alphanumeric characters only',
+                    text: 'try again!',
+                    icon: "error",
+                    type: 'error'
+                })
+                username.focus();
+                return false;
+            }
+        }
 
 
     </script>

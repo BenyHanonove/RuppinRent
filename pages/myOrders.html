@@ -17,9 +17,11 @@
 
     <script>
 
+        //init of two static vars to keep data thouroght all functuions
         let orders;
         let counter = 0;
 
+        //the script that runs in the start of the html page
         $(document).ready(function () {
             $("#signIn").click(signInHerf);
             $("#signUp").click(signUpHerf);
@@ -28,50 +30,80 @@
             loadOrders();
         });
 
+
+        //function that checks if there is user conncted to the system
         function activeUser() {
 
-            if (localStorage.getItem('user') != null) {
+            //check if local storage hold user
+            //add the need button for user
+            if (localStorage.getItem("user") != null) {
                 let active = JSON.parse(localStorage.getItem("user"));
                 let str = "<p>Hello <br>";
                 str += active.Username;
                 str += "</p>";
-                str += '<button id="logOut">LOG OUT</button>'
+                str += '<button id="logOut">LOG OUT</button>';
+                str += '<button id="orderBtn">MY ORDERS</button>';
                 $("#sign").html(str);
+                $("#orderBtn").click(myOrdersHerf);
                 $("#logOut").click(logOut);
             }
+            //otherwise create button for guest 
+            else {
+
+                let str = "<p>Hello Guest<br>";
+                str += "</p>";
+                str += '<button id="signIn">sign in</button>';
+                str += '<button id="signUp">sign up</button>';
+                $("#sign").html(str);
+                $("#signIn").click(signInHerf);
+                $("#signUp").click(signUpHerf);
+
+            }
+
         }
 
+        //change the html page
+        function myOrdersHerf() {
+            window.location.href = 'myOrders.html';
+        }
+
+        //logout from user
         function logOut() {
             localStorage.clear();
             indexHerf();
         }
 
+        //change the html page
         function signInHerf() {
+            localStorage.clear();
             window.location.href = 'signIn.html';
-            localStorage.setItem("house", null);
         }
 
+        //change the html page
         function signUpHerf() {
+            localStorage.clear();
             window.location.href = 'signUp.html';
-            localStorage.setItem("house", null);
         }
 
+        //change the html page
         function indexHerf() {
             window.location.href = 'index.html';
-            localStorage.setItem("house", null);
         }
 
 
+        //load of orders from DB
         function loadOrders() {
             let user = JSON.parse(localStorage.getItem("user"));
             let api = "../api/Orders?Email=" + user.Email;
             ajaxCall("GET", api, "", getOrdersSuccessCB, getOrdersErrorCB);
         }
 
+        //if get fails
         function getOrdersErrorCB(err) {
             console.log(err);
         }
 
+        //function that read orders from DB
         function getOrdersSuccessCB(ordersData) {
 
             let str1 = "<p><h1>My Orders :</h1></p>";
@@ -86,14 +118,16 @@
 
         }
 
+        //if get successed
         function getHouseSuccessCB(houseData) {
             buildPage(houseData, orders[counter]);
         }
-
+        //if get fails
         function getHouseErrorCB(err) {
             console.log(err);
         }
 
+        //function that render the houses this user has
         function buildPage(house, order) {
 
             let orderEnd = order.OrderdOut;
@@ -109,12 +143,14 @@
             str += "<p>" + house.Score + "★</p>";
             str += "<p>" + house.Name + "</p>";
 
+            //if the order has been finished then allow to have button add review
             if (datesTillDone < 0) {
                 str += "<a href='#' onclick='showReviewLog(" + JSON.stringify(order) + ")'>add review</a>";
             }
+            //if order is in with biger range of 2 days allow to delete her
             else {
                 if (datesBeforeOrder > 2) {
-                    str += "<a href='#' onclick='deleteOrder(" + (order.Id).toString() + ")'>cancel</a>";
+                    str += "<a href='#' onclick='deleteOrder(" + (order.Id).toString() + "," + (house.Id).toString() +")'>cancel</a>";
                 }
 
             }
@@ -134,11 +170,12 @@
             counter++;
         }
 
-        function deleteOrder(id) {
+        //fucntion that send delete command to the DB
+        function deleteOrder(id,houseId) {
 
             let orderData = {
                 Email: null,
-                houseId: null,
+                houseId: houseId,
                 orderdIn: null,
                 orderdFor: null,
                 orderdOut: null,
@@ -149,14 +186,15 @@
             ajaxCall("DELETE", api, JSON.stringify(orderData), deleteOrderSuccessCB, deleteOrderErrorCB);
         }
 
-        function deleteOrderSuccessCB() {
+        function deleteOrderSuccessCB(houseId) {
             updateDeleteCounter();
         }
-
+        //if delete fails
         function deleteOrderErrorCB(err) {
             console.log(err);
         }
 
+        //function that return the diffents between 2 dates with number
         function dayGap(orderDate) {
 
             let date = orderDate.split("-");
@@ -173,6 +211,7 @@
             return diffInDays;
         }
 
+        //function that update the delete counter the user have
         function updateDeleteCounter() {
             let user = JSON.parse(localStorage.getItem("user"));
 
@@ -188,18 +227,22 @@
             }
             let api = "../api/Users/Cancel";
             ajaxCall("PUT", api, JSON.stringify(userData), updateCounterSuccessCB, updateCounterErrorCB);
-
-            function updateCounterSuccessCB() {
-                alert("order has been removed");
-                indexHerf();
-            }
-
-            function updateCounterErrorCB(err) {
-                console.log(err);
-            }
         }
 
+        //if update successed
+        function updateCounterSuccessCB() {
+            alert("order has been removed");
+            indexHerf();
+        }
 
+        //if update fails
+        function updateCounterErrorCB(err) {
+            console.log(err);
+        }
+        
+
+
+        //create log for insert new user review
         function showReviewLog(orderData) {
 
             let upload = JSON.stringify(orderData);
@@ -207,24 +250,28 @@
 
             $("#done").html("");
             $("#wait").html("");
-
-            let str = "<h4>we hope u enjoyed your house rent with our website !</h4> ";
+            let str = "";
+            str += "<div class='card'>";
+            str += "<div class='box' style='background-color:gray' >";
+            str += "<div class='content'>";
+            str += "<h4>we hope u enjoyed your house rent with our website !</h4> ";
             str += "<h5>please leave your review:<h5>";
             str += "<input type='text' id='textbox'>";
-
             str += "<button id='btn'>add review</button>"
-
-            $("#big").html(str);
+            str += "</div>";
+            str += "</div>";
+            str += "</div>";
+            $(".container").html(str);
             $("#btn").click(uploadReview);
         }
 
+        //function that create new review and upload it
         function uploadReview() {
             let text = $("#textbox").val();
             let day = new Date();
             let order = JSON.parse(localStorage.getItem("order"));
             let user = JSON.parse(localStorage.getItem("user"));
 
-            console.log(order);
 
             let ReviewData = {
                 Comments: text,
@@ -241,8 +288,10 @@
 
         }
 
+        //function that add review
         function addReviewSuccessCB() {
-            let order = JSON.parse(localStorage.getItem("order"));            
+            let order = JSON.parse(localStorage.getItem("order"));
+            alert("tnx for the review :)");
             let orderData = {
                 Email: null,
                 houseId: null,
@@ -256,10 +305,11 @@
             ajaxCall("DELETE", api, JSON.stringify(orderData), quickDeleteSuccessCB, deleteOrderErrorCB);
         }
 
+        //if delete successed
         function quickDeleteSuccessCB() {
             indexHerf();
         }
-
+        //if post successed
         function addReviewErrorCB(err) {
             console.log(err);
         }
@@ -288,9 +338,9 @@
 
     <div id="big"></div>
 
-    <div id="done" class="container"></div>
-
-    <div id="wait" class="container"></div>
-
+    <div class="container">
+        <div id="done"></div>
+        <div id="wait"></div>
+    </div>
 </body>
 </html>
